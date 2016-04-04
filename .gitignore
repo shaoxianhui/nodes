@@ -26,3 +26,17 @@
 *.exe
 *.out
 *.app
+*.aps
+*.exp
+*.filters
+*.idb
+*.ilk
+*.lastbuildstate
+*.log
+*.tlog
+*.pdb
+*.res
+*.iobj
+*.ipdb
+*.suo
+*.user
