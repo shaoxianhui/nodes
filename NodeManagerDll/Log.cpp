@@ -12,8 +12,8 @@ using namespace log4cplus;
 CLog::CLog()
 {
 	log4cplus::initialize();
-	SharedFileAppenderPtr fun_append(new RollingFileAppender(LOG4CPLUS_TEXT("Logs/fun.log"), 5 * 1024, 5, false, true));
-	SharedFileAppenderPtr node_append(new RollingFileAppender(LOG4CPLUS_TEXT("Logs/nodeInfo.log"), 5 * 1024, 5, false, true));
+	SharedFileAppenderPtr fun_append(new DailyRollingFileAppender(LOG4CPLUS_TEXT("Logs/fun.log"), DAILY, true, 5, true));
+	SharedFileAppenderPtr node_append(new DailyRollingFileAppender(LOG4CPLUS_TEXT("Logs/nodeInfo.log"), DAILY, true, 5, true));
 	fun_append->setLayout(std::auto_ptr<Layout>(new PatternLayout("%D - %m%n")));
 	node_append->setLayout(std::auto_ptr<Layout>(new PatternLayout("%D - %m%n")));
 
