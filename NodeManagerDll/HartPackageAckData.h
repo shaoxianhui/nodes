@@ -1,7 +1,7 @@
 #pragma once
+#include "common.h"
 #pragma pack(push)
 #pragma pack(1)
-#include "common.h"
 class NODEMANAGERDLL_API CHartPackageAckData
 {
 public:

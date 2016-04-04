@@ -26,5 +26,14 @@ public:
 			sscanf_s(suid.c_str() + 2 * i, "%02X", uid + i);
 		}
 	}
+	static uchar CalcCheck(char* buf, int len)
+	{
+		uchar sum = 0;
+		for (int i = 0; i < len - 1; i++)
+		{
+			sum += buf[i];
+		}
+		return sum;
+	}
 };
 

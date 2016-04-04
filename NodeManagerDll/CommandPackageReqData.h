@@ -1,7 +1,7 @@
 #pragma once
+#include "common.h"
 #pragma pack(push)
 #pragma pack(1)
-#include "common.h"
 class NODEMANAGERDLL_API CCommandPackageReqData
 {
 public:
@@ -13,6 +13,5 @@ public:
 	uchar fillStatus;                //前导补0标志，0：不补0，1:补0到有效位数
 	uchar posNum;                    //数据分区位置0~250
 	uchar rev;                       //保留
-
 };
 #pragma pack(pop)

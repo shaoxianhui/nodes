@@ -212,7 +212,6 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 				sprintf_s(temp, "%d", list.nodeInfoList[i].SN);
 				m_list.SetItemText(item, 2, temp);
 			}
-
 		}
 	}
 }
@@ -247,7 +246,4 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			AfxMessageBox(str);
 		}
 	}
-
-	//
-	//MessageBox("ss");
 }

@@ -1,7 +1,8 @@
 #pragma once
+#include "HartPackageReqData.h"
+#include "Util.h"
 #pragma pack(push)
 #pragma pack(1)
-#include "HartPackageReqData.h"
 class NODEMANAGERDLL_API  CHartPackageReq
 {
 public:
@@ -13,27 +14,7 @@ public:
 	__int8 length = 28;
 	CHartPackageReqData data;
 	uchar check = 0;
-public:
-	int getSize() { return sizeof(*this); }
-	uchar fillCheck()
-	{ 
-		uchar sum = 0;
-		char* ptr = (char*)this;
-		for (int i = 0; i < this->getSize() - 1; i++)
-		{
-			sum += ptr[i];
-		}
-		return check = sum;
-	}
-	bool valid()
-	{
-		uchar sum = 0;
-		char* ptr = (char*)this;
-		for (int i = 0; i < this->getSize() - 1; i++)
-		{
-			sum += ptr[i];
-		}
-		return check == sum;
-	}
+/////////////////////////////////////////////////////////////
+	CommomCode
 };
 #pragma pack(pop)

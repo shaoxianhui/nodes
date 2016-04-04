@@ -23,3 +23,14 @@ NODEMANAGERDLL_API void NodeNumRequest(unsigned int *nodeNum);
 NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList);
 
 NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, unsigned char type, unsigned short dataLen, unsigned char *ptrData);
+
+#define CommomCode public:\
+int getSize() { return sizeof(*this); } \
+uchar fillCheck()\
+{\
+	return check = CUtil::CalcCheck((char*)this, getSize());\
+}\
+bool valid()\
+{\
+	return check == CUtil::CalcCheck((char*)this, getSize());\
+}
