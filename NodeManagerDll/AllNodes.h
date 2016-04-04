@@ -35,7 +35,7 @@ public:
 		else
 		{
 			//≤Â»Î
-			info.info.SN = getCount();
+			info.info.SN = (uint)getCount();
 		}
 		allNodes[uid] = info;
 	}

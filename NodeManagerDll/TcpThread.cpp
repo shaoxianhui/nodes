@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "common.h"
 #include "TcpThread.h"
 #include "uv.h"
 #include "task.h"
@@ -12,7 +13,7 @@ static uv_loop_t* loop;
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
 	buf->base = (char*)malloc(suggested_size);
-	buf->len = suggested_size;
+	buf->len = (ULONG)suggested_size;
 
 }
 static void on_close(uv_handle_t* peer)
@@ -53,7 +54,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 	}
 
 	wr = (write_req_t*)malloc(sizeof *wr);
-	wr->buf = uv_buf_init(buf->base, nread);
+	wr->buf = uv_buf_init(buf->base, (uint)nread);
 
 	if (uv_write(&wr->req, handle, &wr->buf, 1, after_write)) 
 	{

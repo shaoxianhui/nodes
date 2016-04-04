@@ -23,7 +23,7 @@ public:
 	{
 		for (int i = 0; i < 12; i++)
 		{
-			sscanf_s(suid.c_str() + 2 * i, "%02X", uid + i);
+			sscanf_s(suid.c_str() + 2 * i, "%hhX", uid + i);
 		}
 	}
 	static uchar CalcCheck(char* buf, int len)
