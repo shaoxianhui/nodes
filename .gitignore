@@ -40,3 +40,6 @@
 *.ipdb
 *.suo
 *.user
+*.sdf
+*.opendb
+*.ipch

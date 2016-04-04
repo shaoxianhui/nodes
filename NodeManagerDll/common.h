@@ -11,7 +11,6 @@ class CNodeInfoList;
 #define uint unsigned int
 #define ushort unsigned short
 #define NODE_MAP map<string, CNodeInfoWithSocket>
-NODEMANAGERDLL_API void InitDll(void);
 
 NODEMANAGERDLL_API void InitGPRS(int GPRSPort, int cmdPort, int maxNode, unsigned char sec[128]);
 

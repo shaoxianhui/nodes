@@ -171,7 +171,11 @@ HCURSOR CNodeManagerDlg::OnQueryDragIcon()
 
 void CNodeManagerDlg::OnBnClickedOk()
 {
-	InitDll();
+	int GPRSPort = 9123;
+	int cmdPort = 9124;
+	int maxNode = 500;
+	uchar sec[128] = { 0x00 };
+	InitGPRS(GPRSPort, cmdPort, maxNode, sec);
 }
 
 

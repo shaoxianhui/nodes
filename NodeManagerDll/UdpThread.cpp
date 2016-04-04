@@ -10,7 +10,7 @@
 #include "AllNodes.h"
 #include "NodeInfoList.h"
 #include "SitchPackageReq.h"
-
+extern int GPRSPort;
 static uv_udp_t udp_server;
 static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) 
 {
@@ -61,7 +61,7 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 DWORD WINAPI UdpThreadProc(LPVOID lpParam)
 {
 	struct sockaddr_in addr;
-	uv_ip4_addr("0.0.0.0", TEST_PORT, &addr);
+	uv_ip4_addr("0.0.0.0", GPRSPort, &addr);
 	uv_udp_init(uv_default_loop(), &udp_server);
 	uv_udp_bind(&udp_server, (const struct sockaddr*) &addr, 0);
 	uv_udp_recv_start(&udp_server, alloc_cb, sv_recv_cb);
