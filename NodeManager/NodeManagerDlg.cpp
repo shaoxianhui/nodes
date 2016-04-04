@@ -222,10 +222,13 @@ void CNodeManagerDlg::OnBnClickedButtonStart()
 	StartGPRS();
 }
 
-
 void CNodeManagerDlg::OnBnClickedButtonStop()
 {
 	StopGPRS();
+	//int t = sizeof(MyUnion);
+	//CString str;
+	//str.Format("%d", t);
+	//MessageBox(str);
 }
 
 

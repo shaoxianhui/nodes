@@ -32,7 +32,7 @@ NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsi
 	maxNode = _maxNode;
 	memcpy(sec, _sec, 128);
 	CUdpThread::GetInstance();
-	//CTcpThread::GetInstance();
+	CTcpThread::GetInstance();
 	CLog::GetInstance()->funLog("≥ı ºªØGPRS£°");
 }
 NODEMANAGERDLL_API void StartGPRS(void)

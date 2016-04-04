@@ -34,3 +34,5 @@ bool valid()\
 {\
 	return check == CUtil::CalcCheck((char*)this, getSize());\
 }
+
+#define MAX_NODE_FRAME 35

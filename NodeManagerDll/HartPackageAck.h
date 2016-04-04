@@ -13,7 +13,7 @@ public:
 	uchar type = 0x2D;
 	__int8 length = 28;
 	CHartPackageAckData data;
-	uchar check = 0;
+	uchar check = 0x00;
 /////////////////////////////////////////////////////////////
 	CommomCode
 };

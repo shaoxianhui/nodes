@@ -13,7 +13,7 @@ public:
 	uchar type = 0x2C;
 	__int8 length = 8;
 	CCommandPackageReqData data;
-	uchar check = 0;
+	uchar check = 0x00;
 /////////////////////////////////////////////////////////////
 	CommomCode
 };

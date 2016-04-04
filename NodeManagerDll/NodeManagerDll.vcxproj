@@ -164,6 +164,9 @@
     <ClInclude Include="NodeInfo.h" />
     <ClInclude Include="NodeInfoList.h" />
     <ClInclude Include="NodeInfoWithSocket.h" />
+    <ClInclude Include="NodeQueryEndPackageAck.h" />
+    <ClInclude Include="NodeQueryPackageAck.h" />
+    <ClInclude Include="NodeQueryPackageReq.h" />
     <ClInclude Include="Package.h" />
     <ClInclude Include="SitchPackageReq.h" />
     <ClInclude Include="stdafx.h" />
@@ -172,6 +175,8 @@
     <ClInclude Include="TcpThread.h" />
     <ClInclude Include="UdpThread.h" />
     <ClInclude Include="Util.h" />
+    <ClInclude Include="VerificationPackageAck.h" />
+    <ClInclude Include="VerificationPackageReq.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AllNodes.cpp" />
@@ -201,6 +206,9 @@
     <ClCompile Include="NodeInfoList.cpp" />
     <ClCompile Include="NodeInfoWithSocket.cpp" />
     <ClCompile Include="NodeManagerDll.cpp" />
+    <ClCompile Include="NodeQueryEndPackageAck.cpp" />
+    <ClCompile Include="NodeQueryPackageAck.cpp" />
+    <ClCompile Include="NodeQueryPackageReq.cpp" />
     <ClCompile Include="Package.cpp" />
     <ClCompile Include="SitchPackageReq.cpp" />
     <ClCompile Include="stdafx.cpp" />
@@ -208,6 +216,8 @@
     <ClCompile Include="TcpThread.cpp" />
     <ClCompile Include="UdpThread.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="VerificationPackageAck.cpp" />
+    <ClCompile Include="VerificationPackageReq.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

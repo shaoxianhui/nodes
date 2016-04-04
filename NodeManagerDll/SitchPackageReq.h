@@ -12,7 +12,7 @@ public:
 	uchar type = 0x02;
 	__int8 length = 1;
 	uchar sw;                                //0-开机 1-关机
-	uchar check = 0;
+	uchar check = 0x00;
 /////////////////////////////////////////////////////////////
 	CommomCode
 };
