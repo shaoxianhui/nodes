@@ -251,8 +251,11 @@ void CNodeSimulatorDlg::SendHartPackage()
 	this->UpdateData(TRUE);
 
 	struct sockaddr_in addr;
-	uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
-
+#ifdef _DEBUG
+	uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+#else
+	uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+#endif // _DEBUG
 	CHartPackageReq req;
 	uv_buf_t buf;
 	req.data.UID[0] = m_valUid;

@@ -24,7 +24,7 @@ static void sv_send_cb(uv_udp_send_t* req, int status)
 	CLog::GetInstance()->funLog("发送数据回调！");
 	free(req);
 }
-static uv_udp_t client;
+//static uv_udp_t client;
 static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, const struct sockaddr* addr, unsigned flags)
 {
 	if (nread <= 0)
@@ -38,7 +38,7 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 	{
 		CHartPackageReq req;
 		memcpy(&req, rcvbuf->base, req.getSize());
-		CAllNodes::GetInstance()->insertNode(&req, addr);
+		CAllNodes::GetInstance()->insertNode(&req, handle, addr);
 		uv_udp_send_t* send_req;
 		uv_buf_t sndbuf;
 		send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
@@ -47,8 +47,8 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 		ack.fillCheck();
 		sndbuf = uv_buf_init((char*)&ack, ack.getSize());
 
-		uv_udp_init(uv_default_loop(), &client);
-		uv_udp_send(send_req, &client, &sndbuf, 1, (struct sockaddr*) addr, sv_send_cb);
+		//uv_udp_init(uv_default_loop(), &client);
+		uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, sv_send_cb);
 		break;
 	}
 	default:
@@ -86,15 +86,15 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 	{
 	case 0x01:
 	{
-		uv_udp_t client1;
+		//uv_udp_t client1;
 		CSitchPackageReq req = CSitchPackageReq();
 		req.sw = ptrData[0];
 
 		uv_buf_t buf;
-		uv_udp_init(uv_default_loop(), &client1);
+		//uv_udp_init(uv_default_loop(), &client1);
 		buf = uv_buf_init((char*)&req, req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
-		uv_udp_send(send_req, &client1, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 		uv_run(uv_default_loop(), UV_RUN_NOWAIT);
 		break;
 	}

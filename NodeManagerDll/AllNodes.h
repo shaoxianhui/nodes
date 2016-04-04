@@ -19,7 +19,7 @@ public:
 		static CAllNodes instance;
 		return &instance;
 	}
-	void insertNode(CHartPackageReq* req, const sockaddr* addr)
+	void insertNode(CHartPackageReq* req, uv_udp_t* handle, const sockaddr* addr)
 	{
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
 		NODE_MAP::iterator iter = allNodes.find(uid);
@@ -27,6 +27,7 @@ public:
 		memcpy(info.info.UID, req->data.UID, 12);
 		memcpy(info.info.phoneNum, req->data.phoneNum, 11);
 		if (addr != NULL) info.addr = *addr;
+		if (handle != NULL) info.handle = handle;
 		if (iter != allNodes.end())
 		{
 			//¸üÐÂ
