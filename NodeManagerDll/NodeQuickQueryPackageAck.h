@@ -46,4 +46,4 @@ private:
 		return check = sum;
 	}
 };
-
+#pragma pack(pop)
