@@ -155,6 +155,8 @@
     <ClInclude Include="CommandPackageReq.h" />
     <ClInclude Include="CommandPackageReqData.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="DisplayPackageReq.h" />
+    <ClInclude Include="DisplayPackageReqData.h" />
     <ClInclude Include="ErrorPackageAck.h" />
     <ClInclude Include="HartPackageAck.h" />
     <ClInclude Include="HartPackageReq.h" />
@@ -167,10 +169,14 @@
     <ClInclude Include="NodeQueryEndPackageAck.h" />
     <ClInclude Include="NodeQueryPackageAck.h" />
     <ClInclude Include="NodeQueryPackageReq.h" />
+    <ClInclude Include="NodeQuickQueryPackageAck.h" />
+    <ClInclude Include="NodeQuickQueryPackageReq.h" />
+    <ClInclude Include="OnOffPackageData.h" />
+    <ClInclude Include="OnOffPackageReq.h" />
     <ClInclude Include="Package.h" />
-    <ClInclude Include="SitchPackageReq.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SuccessPackageAck.h" />
+    <ClInclude Include="SwitchPackageReq.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TcpThread.h" />
     <ClInclude Include="UdpThread.h" />
@@ -182,6 +188,8 @@
     <ClCompile Include="AllNodes.cpp" />
     <ClCompile Include="CommandPackageReq.cpp" />
     <ClCompile Include="CommandPackageReqData.cpp" />
+    <ClCompile Include="DisplayPackageReq.cpp" />
+    <ClCompile Include="DisplayPackageReqData.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -209,10 +217,14 @@
     <ClCompile Include="NodeQueryEndPackageAck.cpp" />
     <ClCompile Include="NodeQueryPackageAck.cpp" />
     <ClCompile Include="NodeQueryPackageReq.cpp" />
+    <ClCompile Include="NodeQuickQueryPackageAck.cpp" />
+    <ClCompile Include="NodeQuickQueryPackageReq.cpp" />
+    <ClCompile Include="OnOffPackageData.cpp" />
+    <ClCompile Include="OnOffPackageReq.cpp" />
     <ClCompile Include="Package.cpp" />
-    <ClCompile Include="SitchPackageReq.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="SuccessPackageAck.cpp" />
+    <ClCompile Include="SwitchPackageReq.cpp" />
     <ClCompile Include="TcpThread.cpp" />
     <ClCompile Include="UdpThread.cpp" />
     <ClCompile Include="Util.cpp" />

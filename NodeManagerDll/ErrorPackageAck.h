@@ -10,7 +10,7 @@ public:
 public:
 	uchar header[2] = { 0xAD, 0x02 };
 	uchar type = 0xA0;                            
-	__int8 length = 1;
+	uchar length = 1;
 	uchar rev = 0;                                //0-开机 1-关机
 	uchar check = 0x00;
 /////////////////////////////////////////////////////////////

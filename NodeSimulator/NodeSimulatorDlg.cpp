@@ -232,7 +232,7 @@ void CNodeSimulatorDlg::OnBnClickedOk()
 	if (hThead == NULL)
 	{
 		hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
-		SetTimer(1, 5000, NULL);
+		SetTimer(1, 1000, NULL);
 	}
 	else
 	{
@@ -252,7 +252,7 @@ void CNodeSimulatorDlg::SendHartPackage()
 
 	struct sockaddr_in addr;
 #ifdef _DEBUG
-	uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+	uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
 #else
 	uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
 #endif // _DEBUG

@@ -10,6 +10,7 @@ class CAllNodes
 {
 private:
 	map<string, CNodeInfoWithSocket> allNodes;
+	uchar quickTable[1024];
 private:
 	CAllNodes();
 	~CAllNodes();
@@ -37,6 +38,8 @@ public:
 		{
 			//²åÈë
 			info.info.SN = (uint)getCount();
+			//¸üÐÂquickTable
+			quickTable[info.info.SN / 8] = quickTable[info.info.SN / 8] | (0x01 << (info.info.SN % 8));
 		}
 		allNodes[uid] = info;
 	}

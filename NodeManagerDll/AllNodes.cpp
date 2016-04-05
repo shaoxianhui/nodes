@@ -4,6 +4,7 @@
 
 CAllNodes::CAllNodes()
 {
+	memset(quickTable, 0x00, 1024);
 }
 
 

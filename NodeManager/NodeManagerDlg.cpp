@@ -10,6 +10,7 @@
 #include <NodeInfo.h>
 #include <NodeInfoList.h>
 #include <HartPackageAck.h>
+#include <NodeQuickQueryPackageAck.h>
 #include <Util.h>
 
 #ifdef _DEBUG
@@ -224,10 +225,15 @@ void CNodeManagerDlg::OnBnClickedButtonStart()
 
 void CNodeManagerDlg::OnBnClickedButtonStop()
 {
-	StopGPRS();
+	//StopGPRS();
+	char buf[1024] = { 0x00 };
+	int len = 0;
+	CNodeInfo ns[4];
+	//CNodeQueryPackageAck ack;
+	//ack.newPackage(1, ns, 4, buf, &len);
 	//int t = sizeof(MyUnion);
 	//CString str;
-	//str.Format("%d", t);
+	//str.Format("%d", len);
 	//MessageBox(str);
 }
 

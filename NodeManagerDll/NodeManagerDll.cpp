@@ -14,7 +14,7 @@
 #include "common.h"
 #include "AllNodes.h"
 #include "NodeInfoList.h"
-#include "SitchPackageReq.h"
+#include "SwitchPackageReq.h"
 /////////////////////////////////////////////////////////////////////////////
 bool isStart = FALSE;
 int GPRSPort = 0;
@@ -27,21 +27,36 @@ using namespace std;
 
 NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsigned char _sec[128])
 {
+	CLog::GetInstance()->funLog("初始化GPRS！");
 	GPRSPort = _GPRSPort;
 	cmdPort = _cmdPort;
 	maxNode = _maxNode;
 	memcpy(sec, _sec, 128);
 	CUdpThread::GetInstance();
 	CTcpThread::GetInstance();
-	CLog::GetInstance()->funLog("初始化GPRS！");
 }
 NODEMANAGERDLL_API void StartGPRS(void)
 {
-	isStart = TRUE;
+	if (isStart == TRUE)
+	{
+		return;
+	}
+	else
+	{
+		CUdpThread::GetInstance()->Start();
+	}
+
 }
 NODEMANAGERDLL_API void StopGPRS(void)
 {
-	isStart = FALSE;
+	if (isStart == FALSE)
+	{
+		return;
+	}
+	else
+	{
+		CUdpThread::GetInstance()->Stop();
+	}
 }
 NODEMANAGERDLL_API void NodeNumRequest(uint *nodeNum)
 {

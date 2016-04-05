@@ -9,8 +9,9 @@
 #include "common.h"
 #include "AllNodes.h"
 #include "NodeInfoList.h"
-#include "SitchPackageReq.h"
+#include "SwitchPackageReq.h"
 extern int GPRSPort;
+extern bool isStart;
 static uv_udp_t udp_server;
 static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) 
 {
@@ -71,11 +72,27 @@ DWORD WINAPI UdpThreadProc(LPVOID lpParam)
 
 CUdpThread::CUdpThread()
 {
+	isStart = TRUE;
 	hThead = CreateThread(NULL, 0, UdpThreadProc, NULL, 0, &dwThreadID);
 }
 
 CUdpThread::~CUdpThread()
 {
+	
+}
+
+void CUdpThread::Stop()
+{
+	CLog::GetInstance()->funLog("¹Ø±ÕUDP¼àÌı£¡");
+	isStart = FALSE;
+	uv_udp_recv_stop(&udp_server);
+}
+
+void CUdpThread::Start()
+{
+	CLog::GetInstance()->funLog("¿ªÆôUDP¼àÌı£¡");
+	isStart = TRUE;
+	uv_udp_recv_start(&udp_server, alloc_cb, sv_recv_cb);
 }
 
 NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort dataLen, uchar *ptrData)
@@ -86,12 +103,10 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 	{
 	case 0x01:
 	{
-		//uv_udp_t client1;
-		CSitchPackageReq req = CSitchPackageReq();
+		CSwitchPackageReq req = CSwitchPackageReq();
 		req.sw = ptrData[0];
 
 		uv_buf_t buf;
-		//uv_udp_init(uv_default_loop(), &client1);
 		buf = uv_buf_init((char*)&req, req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
 		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);

@@ -13,4 +13,6 @@ public:
 		static CUdpThread instance;
 		return &instance;
 	}
+	void Stop();
+	void Start();
 };

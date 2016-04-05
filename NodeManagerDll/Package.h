@@ -6,7 +6,7 @@ public:
 	CPackage();
 	~CPackage();
 public:
-	virtual int getSize() { return sizeof(*this); }
+	virtual int getSize() = 0;
 	uchar fillCheck()
 	{
 		uchar sum = 0;

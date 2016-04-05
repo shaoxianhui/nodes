@@ -1,5 +1,7 @@
 #pragma once
 #include "common.h"
+#pragma pack(push)
+#pragma pack(1)
 class NODEMANAGERDLL_API  CNodeInfo
 {
 public:
@@ -23,4 +25,4 @@ public:
 	bool isSuccess();
 	bool isOnlineAndSuccess();
 };
-
+#pragma pack(pop)

@@ -11,7 +11,7 @@ public:
 public:
 	uchar header[2] = { 0xAD, 0x02 };
 	uchar type = 0x2B;
-	__int8 length = 28;
+	uchar length = 28;
 	CHartPackageReqData data;
 	uchar check = 0x00;
 /////////////////////////////////////////////////////////////

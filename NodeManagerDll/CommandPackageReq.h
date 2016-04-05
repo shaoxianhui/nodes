@@ -11,7 +11,7 @@ public:
 public:
 	uchar header[2] = { 0xAD, 0x02 };
 	uchar type = 0x2C;
-	__int8 length = 8;
+	uchar length = 8;
 	CCommandPackageReqData data;
 	uchar check = 0x00;
 /////////////////////////////////////////////////////////////

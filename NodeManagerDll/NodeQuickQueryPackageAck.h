@@ -1,31 +1,31 @@
 #pragma once
-#include "NodeInfo.h"
 #include "Util.h"
 #pragma pack(push)
 #pragma pack(1)
-class NODEMANAGERDLL_API  CNodeQueryPackageAck
+class NODEMANAGERDLL_API CNodeQuickQueryPackageAck
 {
 public:
-	CNodeQueryPackageAck();
-	~CNodeQueryPackageAck();
+	CNodeQuickQueryPackageAck();
+	~CNodeQuickQueryPackageAck();
 public:
 	uchar header[2] = { 0xAA, 0x55 };
-	uchar type = 0xF2;
+	uchar type = 0xF3;
 	ushort length;
 	ushort numFrame;
-	CNodeInfo* data = NULL;
+	uchar* data = NULL;
 	uchar check = 0x00;
 public:
 	void newPackage(ushort frame, CNodeInfo* node, int num, char* buf, int* len)
 	{
-		data = new CNodeInfo[num];
+		num = ceil((float)num / 8);
+		data = new uchar[num];
 		memcpy(data, node, num);
-		length = num * sizeof(CNodeInfo) + sizeof(numFrame);
+		length = num * sizeof(uchar) + sizeof(numFrame);
 		numFrame = frame;
 		fillCheck();
 		*len = length + 6;
 		memcpy(buf, this, 7);
-		memcpy(buf + 7, data, num * sizeof(CNodeInfo));
+		memcpy(buf + 7, data, num * sizeof(char));
 		buf[*len - 1] = check;
 
 	}
@@ -46,4 +46,4 @@ private:
 		return check = sum;
 	}
 };
-#pragma pack(pop)
+
