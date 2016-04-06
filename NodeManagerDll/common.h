@@ -36,3 +36,5 @@ bool valid()\
 }
 
 #define MAX_NODE_FRAME 35
+
+#define HART_CYCLE 5000 //ms

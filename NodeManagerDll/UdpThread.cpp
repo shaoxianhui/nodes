@@ -7,7 +7,6 @@
 #include "HartPackageAck.h"
 #include "Log.h"
 #include "common.h"
-#include "AllNodes.h"
 #include "NodeInfoList.h"
 #include "SwitchPackageReq.h"
 extern int GPRSPort;

@@ -225,7 +225,7 @@ void CNodeManagerDlg::OnBnClickedButtonStart()
 
 void CNodeManagerDlg::OnBnClickedButtonStop()
 {
-	//StopGPRS();
+	StopGPRS();
 	char buf[1024] = { 0x00 };
 	int len = 0;
 	CNodeInfo ns[4];

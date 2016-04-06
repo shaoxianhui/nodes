@@ -5,6 +5,7 @@
 #include "HartPackageReq.h"
 #include "Util.h"
 #include "NodeInfoList.h"
+#include <time.h>
 using namespace std;
 class CAllNodes
 {
@@ -41,6 +42,8 @@ public:
 			//¸üÐÂquickTable
 			quickTable[info.info.SN / 8] = quickTable[info.info.SN / 8] | (0x01 << (info.info.SN % 8));
 		}
+		info.info.setOnline();
+		time(&info.timestamp);
 		allNodes[uid] = info;
 	}
 	CNodeInfoWithSocket* findNode(uchar UID[12])
@@ -78,6 +81,18 @@ public:
 			}
 		}
 		ptrNodeInfoList->nodeNum = 0;
+	}
+	void updateStatus()
+	{
+		for (NODE_MAP::iterator iter = allNodes.begin();iter != allNodes.end();iter++)
+		{
+			time_t now;
+			time(&now);
+			if (now - iter->second.timestamp > HART_CYCLE * 2)
+			{
+				iter->second.info.setOffline();
+			}
+		}
 	}
 };
 
