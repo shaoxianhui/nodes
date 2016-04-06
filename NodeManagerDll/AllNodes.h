@@ -39,12 +39,12 @@ public:
 		{
 			//²åÈë
 			info.info.SN = (uint)getCount();
-			//¸üĞÂquickTable
-			quickTable[info.info.SN / 8] = quickTable[info.info.SN / 8] | (0x01 << (info.info.SN % 8));
 		}
 		info.info.setOnline();
+		info.info.setFail();
 		time(&info.timestamp);
 		allNodes[uid] = info;
+		handle->data = &allNodes[uid];
 	}
 	CNodeInfoWithSocket* findNode(uchar UID[12])
 	{
@@ -82,13 +82,17 @@ public:
 		}
 		ptrNodeInfoList->nodeNum = 0;
 	}
+	void updateQuickTable(CNodeInfo* node)
+	{
+		quickTable[node->SN / 8] = quickTable[node->SN / 8] | ((node->allStatus & 0x01) << (node->SN % 8));
+	}
 	void updateStatus()
 	{
 		for (NODE_MAP::iterator iter = allNodes.begin();iter != allNodes.end();iter++)
 		{
 			time_t now;
 			time(&now);
-			if (now - iter->second.timestamp > HART_CYCLE * 2)
+			if (now - iter->second.timestamp > HART_CYCLE * 2 / 1000)
 			{
 				iter->second.info.setOffline();
 			}

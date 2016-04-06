@@ -47,11 +47,9 @@ NODEMANAGERDLL_API void StartGPRS(void)
 	{
 		CUdpThread::GetInstance()->Start();
 	}
-
 }
 NODEMANAGERDLL_API void StopGPRS(void)
 {
-	CLog::GetInstance()->funLog("qwqw£¡");
 	if (isStart == FALSE)
 	{
 		return;
@@ -69,8 +67,4 @@ NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList)
 {
 	CAllNodes::GetInstance()->fill(ptrNodeInfoList);
 }
-//NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, unsigned char type, unsigned short dataLen, unsigned char *ptrData)
-//{
-
-//}
 /////////////////////////////////////////////////////////////////////////////

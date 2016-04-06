@@ -9,6 +9,7 @@ typedef struct {
 } write_req_t;
 
 static uv_tcp_t tcp_server;
+static uv_loop_t loop;
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
 	buf->base = (char*)malloc(suggested_size);
@@ -65,7 +66,7 @@ static void on_connection(uv_stream_t* server, int status)
 {
 	uv_stream_t* stream;
 	stream = (uv_stream_t*)malloc(sizeof(uv_tcp_t));
-	uv_tcp_init(uv_default_loop(), (uv_tcp_t*)stream);
+	uv_tcp_init(&loop, (uv_tcp_t*)stream);
 
 	stream->data = server;
 
@@ -75,12 +76,13 @@ static void on_connection(uv_stream_t* server, int status)
 
 DWORD WINAPI TcpThreadProc(LPVOID lpParam)
 {
+	uv_loop_init(&loop);
 	struct sockaddr_in addr;
 	uv_ip4_addr("0.0.0.0", TEST_PORT + 1, &addr);
-	uv_tcp_init(uv_default_loop(), &tcp_server);
+	uv_tcp_init(&loop, &tcp_server);
 	uv_tcp_bind(&tcp_server, (const struct sockaddr*) &addr, 0);
 	uv_listen((uv_stream_t*)&tcp_server, SOMAXCONN, on_connection);
-	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+	uv_run(&loop, UV_RUN_DEFAULT);
 	return 0;
 }
 

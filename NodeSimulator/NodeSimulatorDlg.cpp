@@ -10,6 +10,8 @@
 #include "task.h"
 #include <HartPackageReq.h>
 #include <HartPackageAck.h>
+#include <SwitchPackageReq.h>
+#include <SuccessPackageAck.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -173,31 +175,52 @@ static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 	buf->base = slab;
 	buf->len = sizeof(slab);
 }
-
+static void cl_send_cb1(uv_udp_send_t* req, int status)
+{
+	free(req);
+}
 static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, const struct sockaddr* addr, unsigned flags) 
 {
 	if (nread <= 0)
 		return;
 	switch (rcvbuf->base[2])
 	{
-	case 0x2D:
-	{
-		CHartPackageAck ack;
-		memcpy(&ack, rcvbuf->base, ack.getSize());
-		if (ack.valid())
+		case 0x2D:
 		{
-			dlg->m_valCount = hart_count++;
-			PostMessage(dlg->m_hWnd, WM_MYUPDATEDATA, NULL, NULL);
+			CHartPackageAck ack;
+			ack.fromBuf(rcvbuf->base);
+			if (ack.valid())
+			{
+				dlg->m_valCount = hart_count++;
+				PostMessage(dlg->m_hWnd, WM_MYUPDATEDATA, NULL, NULL);
+			}
+			break;
 		}
-		break;
-	}
+		case 0x02:
+		{
+			CSwitchPackageReq req;
+			req.fromBuf(rcvbuf->base);
+			if (req.valid())
+			{
+				//申请发送请求
+				uv_udp_send_t* send_req;
+				send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
+				//响应包
+				CSuccessPackageAck ack;
+				//初始化buf
+				uv_buf_t sndbuf;
+				sndbuf = uv_buf_init(ack.toBuf(), ack.getSize());
+				//发送响应包
+				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb1);
+			}
+		}
+
 	default:
 	{
 		break;
 	}
 	}
 }
-
 static void cl_send_cb(uv_udp_send_t* req, int status)
 {
 	uv_udp_recv_start(req->handle, alloc_cb, cl_recv_cb);
@@ -232,7 +255,7 @@ void CNodeSimulatorDlg::OnBnClickedOk()
 	if (hThead == NULL)
 	{
 		hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
-		SetTimer(1, 1000, NULL);
+		SetTimer(1, 100000, NULL);
 	}
 	else
 	{

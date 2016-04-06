@@ -1,11 +1,11 @@
 #include "NodeInfo.h"
 #include "stdio.h"
 #include "string.h"
+#include "AllNodes.h"
 
 CNodeInfo::CNodeInfo()
 {
 	memset(UID, 0, sizeof(UID));
-	//sprintf((char*)phoneNum, "%s", "00000000000");
 	allStatus = 0;
 	SN = 0;
 }
@@ -17,10 +17,14 @@ CNodeInfo::~CNodeInfo()
 void CNodeInfo::setOnline()
 {
 	allStatus = allStatus | 0x01;
+	//更新quickTable
+	CAllNodes::GetInstance()->updateQuickTable(this);
 }
 void CNodeInfo::setOffline()
 {
 	allStatus = allStatus & 0xFE;
+	//更新quickTable
+	CAllNodes::GetInstance()->updateQuickTable(this);
 }
 void CNodeInfo::setSuccess()
 {

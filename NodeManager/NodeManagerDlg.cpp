@@ -114,9 +114,11 @@ BOOL CNodeManagerDlg::OnInitDialog()
 	CRect rect;
 	m_list.GetClientRect(&rect);
 	m_list.SetExtendedStyle(m_list.GetExtendedStyle() | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-	m_list.InsertColumn(0, _T("UID"), LVCFMT_CENTER, rect.Width() / 38 * 24, 0);
-	m_list.InsertColumn(1, _T("手机号"), LVCFMT_CENTER, rect.Width() / 38 * 11, 1);
-	m_list.InsertColumn(2, _T("SN"), LVCFMT_CENTER, rect.Width() / 38 * 3, 2);
+	m_list.InsertColumn(0, _T("UID"), LVCFMT_CENTER, rect.Width() / 44 * 21, 0);
+	m_list.InsertColumn(1, _T("手机号"), LVCFMT_CENTER, rect.Width() / 44 * 11, 1);
+	m_list.InsertColumn(2, _T("SN"), LVCFMT_CENTER, rect.Width() / 44 * 4, 2);
+	m_list.InsertColumn(3, _T("在线"), LVCFMT_CENTER, rect.Width() / 44 * 4, 3);
+	m_list.InsertColumn(4, _T("通信"), LVCFMT_CENTER, rect.Width() / 44 * 4, 4);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -212,6 +214,10 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 				memset(temp, 0x00, 12);
 				sprintf_s(temp, "%d", list.nodeInfoList[i].SN);
 				m_list.SetItemText(item, 2, temp);
+				sprintf_s(temp, "%d", list.nodeInfoList[i].isOnline());
+				m_list.SetItemText(item, 3, temp);
+				sprintf_s(temp, "%d", list.nodeInfoList[i].isSuccess());
+				m_list.SetItemText(item, 4, temp);
 			}
 		}
 	}
@@ -225,10 +231,21 @@ void CNodeManagerDlg::OnBnClickedButtonStart()
 
 void CNodeManagerDlg::OnBnClickedButtonStop()
 {
-	StopGPRS();
+	//StopGPRS();
 	char buf[1024] = { 0x00 };
 	int len = 0;
 	CNodeInfo ns[4];
+
+	char condition = 0xA1;
+	switch (condition)
+	{
+	case 0xA1:
+		printf("hello world!");
+		break;
+	default:
+		printf("default!");
+		break;
+	}
 	//CNodeQueryPackageAck ack;
 	//ack.newPackage(1, ns, 4, buf, &len);
 	//int t = sizeof(MyUnion);
