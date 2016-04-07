@@ -7,14 +7,10 @@
 
 static uv_timer_t repeat;
 static uv_loop_t loop;
-static void repeat_close_cb(uv_handle_t* handle)
-{
-
-}
 
 static void repeat_cb(uv_timer_t* handle)
 {
-	CLog::GetInstance()->funLog("repeate!");
+	CLog::GetInstance()->funLog("Timer!");
 	CAllNodes::GetInstance()->updateStatus();
 }
 

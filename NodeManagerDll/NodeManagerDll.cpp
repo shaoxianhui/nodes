@@ -6,6 +6,7 @@
 #include "UdpThread.h"
 #include "TcpThread.h"
 #include "TimerThread.h"
+#include "CountThread.h"
 #include "Log.h"
 #include "sqlite3.h"
 #include <iostream>
@@ -36,6 +37,7 @@ NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsi
 	CUdpThread::GetInstance();
 	CTcpThread::GetInstance();
 	CTimerThread::GetInstance();
+	CCountThread::GetInstance();
 }
 NODEMANAGERDLL_API void StartGPRS(void)
 {
