@@ -34,14 +34,15 @@ public:
 		{
 			//¸üÐÂ
 			info.info.SN = iter->second.info.SN;
+			info.info.allStatus = iter->second.info.allStatus;
 		}
 		else
 		{
 			//²åÈë
 			info.info.SN = (uint)getCount();
+			info.info.setFail();
 		}
 		info.info.setOnline();
-		info.info.setFail();
 		time(&info.timestamp);
 		allNodes[uid] = info;
 		handle->data = &allNodes[uid];

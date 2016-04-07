@@ -12,6 +12,7 @@
 #include <HartPackageAck.h>
 #include <NodeQuickQueryPackageAck.h>
 #include <Util.h>
+#include <CommandPackageReqData.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -231,27 +232,7 @@ void CNodeManagerDlg::OnBnClickedButtonStart()
 
 void CNodeManagerDlg::OnBnClickedButtonStop()
 {
-	//StopGPRS();
-	char buf[1024] = { 0x00 };
-	int len = 0;
-	CNodeInfo ns[4];
-
-	char condition = 0xA1;
-	switch (condition)
-	{
-	case 0xA1:
-		printf("hello world!");
-		break;
-	default:
-		printf("default!");
-		break;
-	}
-	//CNodeQueryPackageAck ack;
-	//ack.newPackage(1, ns, 4, buf, &len);
-	//int t = sizeof(MyUnion);
-	//CString str;
-	//str.Format("%d", len);
-	//MessageBox(str);
+	StopGPRS();
 }
 
 
@@ -266,9 +247,12 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 
-			uchar data[1];
+			/*uchar data[1];
 			data[0] = 0;
 			NodeCmdSend(&node, 1, 1, data);
+			AfxMessageBox(str);*/
+			CCommandPackageReqData data;
+			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);
 		}
 	}

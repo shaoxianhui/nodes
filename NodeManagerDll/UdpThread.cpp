@@ -10,6 +10,8 @@
 #include "NodeInfoList.h"
 #include "SwitchPackageReq.h"
 #include "SuccessPackageAck.h"
+#include "ErrorPackageAck.h"
+#include "CommandPackageReq.h"
 extern int GPRSPort;
 extern bool isStart;
 static uv_udp_t udp_server;
@@ -34,6 +36,7 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 		return;
 	switch ((uchar)rcvbuf->base[2])
 	{
+		//心跳
 		case 0x2B:
 		{
 			CHartPackageReq req;
@@ -56,9 +59,26 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			}
 			break;
 		}
+		//正确数据包
 		case 0xA1:
 		{
 			CSuccessPackageAck ack;
+			ack.fromBuf(rcvbuf->base);
+			if (ack.valid() == TRUE)
+			{
+				// 插入或者更新节点信息
+				if (handle->data != NULL)
+				{
+					CNodeInfo* node = (CNodeInfo*)handle->data;
+					node->setSuccess();
+				}
+			}
+			break;
+		}
+		//错误数据包
+		case 0xA0:
+		{
+			CErrorPackageAck ack;
 			ack.fromBuf(rcvbuf->base);
 			if (ack.valid() == TRUE)
 			{
@@ -123,12 +143,12 @@ void CUdpThread::Start()
 
 NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort dataLen, uchar *ptrData)
 {
-	uv_udp_send_t* send_req = new uv_udp_send_t;
 	switch (type)
 	{
 	case 0x01:
 	{
-		CSwitchPackageReq req = CSwitchPackageReq();
+		uv_udp_send_t* send_req = new uv_udp_send_t;
+		CSwitchPackageReq req;
 		req.sw = ptrData[0];
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
@@ -140,6 +160,15 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 	}
 	case 0x02:
 	{
+		uv_udp_send_t* send_req = new uv_udp_send_t;
+		CCommandPackageReq req;
+		memcpy(&req.data, ptrData, dataLen);
+		uv_buf_t buf;
+		buf = uv_buf_init(req.toBuf(), req.getSize());
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
+		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		info->info.setFail();
+		uv_run(uv_default_loop(), UV_RUN_NOWAIT);
 		break;
 	}
 	}

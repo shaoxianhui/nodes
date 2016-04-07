@@ -12,6 +12,7 @@
 #include <HartPackageAck.h>
 #include <SwitchPackageReq.h>
 #include <SuccessPackageAck.h>
+#include <CommandPackageReq.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -183,7 +184,7 @@ static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 {
 	if (nread <= 0)
 		return;
-	switch (rcvbuf->base[2])
+	switch ((uchar)rcvbuf->base[2])
 	{
 		case 0x2D:
 		{
@@ -213,12 +214,30 @@ static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 				//发送响应包
 				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb1);
 			}
+			break;
 		}
-
-	default:
-	{
-		break;
-	}
+		case 0x2C:
+		{
+			CCommandPackageReq req;
+			req.fromBuf(rcvbuf->base);
+			if (req.valid())
+			{
+				//申请发送请求
+				uv_udp_send_t* send_req;
+				send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
+				//响应包
+				CSuccessPackageAck ack;
+				//初始化buf
+				uv_buf_t sndbuf;
+				sndbuf = uv_buf_init(ack.toBuf(), ack.getSize());
+				//发送响应包
+				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb1);
+			}
+		}
+		default:
+		{
+			break;
+		}
 	}
 }
 static void cl_send_cb(uv_udp_send_t* req, int status)
@@ -255,7 +274,7 @@ void CNodeSimulatorDlg::OnBnClickedOk()
 	if (hThead == NULL)
 	{
 		hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
-		SetTimer(1, 100000, NULL);
+		SetTimer(1, 1000, NULL);
 	}
 	else
 	{
