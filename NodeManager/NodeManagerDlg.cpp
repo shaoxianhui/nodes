@@ -13,6 +13,10 @@
 #include <NodeQuickQueryPackageAck.h>
 #include <Util.h>
 #include <CommandPackageReqData.h>
+#include <VerificationPackageReq.h>
+#include <VerificationPackageAck.h>
+#include <uv.h>
+#include <task.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -78,6 +82,11 @@ BEGIN_MESSAGE_MAP(CNodeManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_NUM, &CNodeManagerDlg::OnBnClickedButtonNum)
 	ON_BN_CLICKED(IDC_BUTTON_INFO, &CNodeManagerDlg::OnBnClickedButtonInfo)
 	ON_BN_CLICKED(IDC_BUTTON_COMMAND, &CNodeManagerDlg::OnBnClickedButtonCommand)
+	ON_BN_CLICKED(IDC_BUTTON_VERI, &CNodeManagerDlg::OnBnClickedButtonVeri)
+	ON_BN_CLICKED(IDC_BUTTON_NUM2, &CNodeManagerDlg::OnBnClickedButtonNum2)
+	ON_BN_CLICKED(IDC_BUTTON_INFO2, &CNodeManagerDlg::OnBnClickedButtonInfo2)
+	ON_BN_CLICKED(IDC_BUTTON_COMMAND2, &CNodeManagerDlg::OnBnClickedButtonCommand2)
+	ON_BN_CLICKED(IDC_BUTTON_CONN, &CNodeManagerDlg::OnBnClickedButtonConn)
 END_MESSAGE_MAP()
 
 
@@ -256,4 +265,89 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			AfxMessageBox(str);
 		}
 	}
+}
+
+static uv_tcp_t tcp_handle;
+static uv_connect_t connect_req;
+
+static void write_cb(uv_write_t* req, int status) {
+	free(req);
+}
+
+void CNodeManagerDlg::OnBnClickedButtonVeri()
+{
+	CVerificationPackageReq req;
+	uv_write_t* write_req;
+	uv_buf_t buf;
+
+	buf = uv_buf_init(req.toBuf(), req.getSize());
+	
+	write_req = (uv_write_t*)malloc(sizeof *write_req);
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonNum2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonInfo2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonCommand2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
+{
+	buf->base = (char*)malloc(suggested_size);
+	buf->len = (ULONG)suggested_size;
+
+}
+static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
+{
+	switch ((uchar)buf->base[2])
+	{
+		case 0xF1:
+		{
+			CVerificationPackageAck ack;
+			ack.fromBuf(buf->base);
+			if (ack.valid())
+			{
+				CString str;
+				str.Format("%d", ack.cert);
+				AfxMessageBox(str);
+			}
+			break;
+		}
+		default:
+		{
+			break;
+		}
+	}
+}
+static void connect_cb(uv_connect_t* conn_req, int status) {
+	uv_read_start((uv_stream_t*)&tcp_handle, echo_alloc, after_read);
+
+}
+DWORD WINAPI ThreadProc(LPVOID lpParam)
+{
+	struct sockaddr_in addr;
+	uv_ip4_addr("127.0.0.1", TEST_PORT + 1, &addr);
+
+	uv_tcp_init(uv_default_loop(), &tcp_handle);
+	uv_tcp_connect(&connect_req, &tcp_handle, (const struct sockaddr*) &addr, connect_cb);
+	uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+
+	AfxMessageBox("线程结束");
+	return 0;
+}
+void CNodeManagerDlg::OnBnClickedButtonConn()
+{
+	hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
 }

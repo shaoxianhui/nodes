@@ -40,4 +40,12 @@ public:
 	afx_msg void OnBnClickedButtonNum();
 	afx_msg void OnBnClickedButtonInfo();
 	afx_msg void OnBnClickedButtonCommand();
+	afx_msg void OnBnClickedButtonVeri();
+	afx_msg void OnBnClickedButtonNum2();
+	afx_msg void OnBnClickedButtonInfo2();
+	afx_msg void OnBnClickedButtonCommand2();
+	afx_msg void OnBnClickedButtonConn();
+private:
+	HANDLE hThead = NULL;
+	DWORD  dwThreadID;
 };

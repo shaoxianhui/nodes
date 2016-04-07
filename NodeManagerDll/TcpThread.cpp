@@ -3,6 +3,9 @@
 #include "TcpThread.h"
 #include "uv.h"
 #include "task.h"
+#include "VerificationPackageReq.h"
+#include "VerificationPackageAck.h"
+#include "CountThread.h"
 typedef struct {
 	uv_write_t req;
 	uv_buf_t buf;
@@ -32,13 +35,12 @@ static void after_write(uv_write_t* req, int status)
 
 	/* Free the read/write buffer and the request */
 	wr = (write_req_t*)req;
-	free(wr->buf.base);
+	//free(wr->buf.base);
 	free(wr);
 }
 
 static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 { 
-	write_req_t *wr;
 	uv_shutdown_t* sreq;
 
 	if (nread < 0) {
@@ -53,12 +55,36 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 		return;
 	}
 
-	wr = (write_req_t*)malloc(sizeof *wr);
-	wr->buf = uv_buf_init(buf->base, (uint)nread);
-
-	if (uv_write(&wr->req, handle, &wr->buf, 1, after_write)) 
+	switch ((uchar)buf->base[2])
 	{
-		FATAL("uv_write failed");
+		case 0x01:
+		{
+			uchar r = 0;
+			if (CCountThread::GetInstance()->up())
+			{
+				r = 1;
+			}
+			CVerificationPackageReq req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+				CVerificationPackageAck ack;
+				ack.cert = r;
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
+
+				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				{
+					FATAL("uv_write failed");
+				}
+			}
+			break;
+		}
+		default:
+		{
+			break;
+		}
 	}
 }
 

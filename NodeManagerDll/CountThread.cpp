@@ -7,12 +7,11 @@
 
 static uv_timer_t repeat;
 static uv_loop_t loop;
-static int veri_count = 0;
 
 static void repeat_cb(uv_timer_t* handle)
 {
 	CLog::GetInstance()->funLog("Verification Count = 0!");
-	veri_count = 0;
+	CCountThread::GetInstance()->zero();
 }
 
 DWORD WINAPI CountThreadProc(LPVOID lpParam)
@@ -26,6 +25,7 @@ DWORD WINAPI CountThreadProc(LPVOID lpParam)
 
 CCountThread::CCountThread()
 {
+	veri_count = 0;
 	hThead = CreateThread(NULL, 0, CountThreadProc, NULL, 0, &dwThreadID);
 }
 
