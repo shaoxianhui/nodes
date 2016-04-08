@@ -16,18 +16,33 @@ public:
 	CNodeInfo* data = NULL;
 	uchar check = 0x00;
 public:
-	void newPackage(ushort frame, CNodeInfo* node, int num, char* buf, int* len)
+	void toBuf(ushort frame, CNodeInfo* node, int num, char* buf, int* len)
 	{
 		data = new CNodeInfo[num];
 		memcpy(data, node, num);
 		length = num * sizeof(CNodeInfo) + sizeof(numFrame);
 		numFrame = frame;
-		fillCheck();
 		*len = length + 6;
 		memcpy(buf, this, 7);
 		memcpy(buf + 7, data, num * sizeof(CNodeInfo));
+		check = fillCheck();
 		buf[*len - 1] = check;
-
+	}
+	void fromBuf(char* buf, int len)
+	{ 
+		int num = (len - 6 - sizeof(numFrame)) / sizeof(CNodeInfo);
+		data = new CNodeInfo[num];
+		memcpy(this, buf, 7);
+		memcpy(data, buf + 7, num * sizeof(CNodeInfo));
+		check = buf[len - 1];
+	}
+	int getSize() 
+	{ 
+		return length + 6;
+	}
+	bool valid()
+	{
+		return check == fillCheck();
 	}
 private:
 	uchar fillCheck()
@@ -43,7 +58,7 @@ private:
 		{
 			sum += buf[i];
 		}
-		return check = sum;
+		return sum;
 	}
 };
 #pragma pack(pop)

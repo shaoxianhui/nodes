@@ -48,4 +48,6 @@ public:
 private:
 	HANDLE hThead = NULL;
 	DWORD  dwThreadID;
+public:
+	afx_msg void OnBnClickedButtonQuick();
 };

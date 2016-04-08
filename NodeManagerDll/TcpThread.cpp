@@ -6,6 +6,10 @@
 #include "VerificationPackageReq.h"
 #include "VerificationPackageAck.h"
 #include "CountThread.h"
+#include "NodeQueryPackageReq.h"
+#include "NodeQueryPackageAck.h"
+#include "NodeQueryEndPackageAck.h"
+#include "NodeQuickQueryPackageReq.h"
 typedef struct {
 	uv_write_t req;
 	uv_buf_t buf;
@@ -70,6 +74,68 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			{
 				CVerificationPackageAck ack;
 				ack.cert = r;
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
+
+				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				{
+					FATAL("uv_write failed");
+				}
+			}
+			break;
+		}
+		case 0x02:
+		{
+			CNodeQueryPackageReq req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+				/*CNodeQueryPackageAck ack;
+				CNodeInfo n[4];
+				char buf[1024];
+				int len;
+				ack.toBuf(1, n, 4, buf, &len);
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(buf, ack.getSize());
+
+				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				{
+					FATAL("uv_write failed");
+				}*/
+				CNodeQueryEndPackageAck ack;
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
+
+				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				{
+					FATAL("uv_write failed");
+				}
+			}
+			break;
+		}
+		case 0xF3:
+		{
+			CNodeQuickQueryPackageReq req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+				/*CNodeQueryPackageAck ack;
+				CNodeInfo n[4];
+				char buf[1024];
+				int len;
+				ack.toBuf(1, n, 4, buf, &len);
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(buf, ack.getSize());
+
+				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				{
+				FATAL("uv_write failed");
+				}*/
+				CNodeQueryEndPackageAck ack;
 				write_req_t *wr;
 				wr = (write_req_t*)malloc(sizeof *wr);
 				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());

@@ -1,7 +1,6 @@
 
 // NodeManagerDlg.cpp : 实现文件
 //
-
 #include "stdafx.h"
 #include "NodeManager.h"
 #include "NodeManagerDlg.h"
@@ -11,20 +10,22 @@
 #include <NodeInfoList.h>
 #include <HartPackageAck.h>
 #include <NodeQuickQueryPackageAck.h>
+#include <NodeQueryPackageAck.h>
+#include <NodeQueryEndPackageAck.h>
+#include <NodeQueryPackageReq.h>
 #include <Util.h>
 #include <CommandPackageReqData.h>
 #include <VerificationPackageReq.h>
 #include <VerificationPackageAck.h>
 #include <uv.h>
 #include <task.h>
+#include <NodeQuickQueryPackageReq.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
-
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
-
 class CAboutDlg : public CDialogEx
 {
 public:
@@ -55,11 +56,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
 // CNodeManagerDlg 对话框
-
-
-
 CNodeManagerDlg::CNodeManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_NODEMANAGER_DIALOG, pParent)
 {
@@ -87,11 +84,10 @@ BEGIN_MESSAGE_MAP(CNodeManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_INFO2, &CNodeManagerDlg::OnBnClickedButtonInfo2)
 	ON_BN_CLICKED(IDC_BUTTON_COMMAND2, &CNodeManagerDlg::OnBnClickedButtonCommand2)
 	ON_BN_CLICKED(IDC_BUTTON_CONN, &CNodeManagerDlg::OnBnClickedButtonConn)
+	ON_BN_CLICKED(IDC_BUTTON_QUICK, &CNodeManagerDlg::OnBnClickedButtonQuick)
 END_MESSAGE_MAP()
 
-
 // CNodeManagerDlg 消息处理程序
-
 BOOL CNodeManagerDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -149,7 +145,6 @@ void CNodeManagerDlg::OnSysCommand(UINT nID, LPARAM lParam)
 // 如果向对话框添加最小化按钮，则需要下面的代码
 //  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
-
 void CNodeManagerDlg::OnPaint()
 {
 	if (IsIconic())
@@ -191,7 +186,6 @@ void CNodeManagerDlg::OnBnClickedOk()
 	InitGPRS(GPRSPort, cmdPort, maxNode, sec);
 }
 
-
 void CNodeManagerDlg::OnBnClickedButtonNum()
 {
 	uint num;
@@ -200,7 +194,6 @@ void CNodeManagerDlg::OnBnClickedButtonNum()
 	str.Format("%d", num);
 	MessageBox(str);
 }
-
 
 void CNodeManagerDlg::OnBnClickedButtonInfo()
 {
@@ -233,7 +226,6 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 	}
 }
 
-
 void CNodeManagerDlg::OnBnClickedButtonStart()
 {
 	StartGPRS();
@@ -243,7 +235,6 @@ void CNodeManagerDlg::OnBnClickedButtonStop()
 {
 	StopGPRS();
 }
-
 
 void CNodeManagerDlg::OnBnClickedButtonCommand()
 {
@@ -286,29 +277,35 @@ void CNodeManagerDlg::OnBnClickedButtonVeri()
 	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 }
 
-
 void CNodeManagerDlg::OnBnClickedButtonNum2()
 {
 	// TODO: 在此添加控件通知处理程序代码
 }
 
-
 void CNodeManagerDlg::OnBnClickedButtonInfo2()
 {
-	// TODO: 在此添加控件通知处理程序代码
-}
+	CNodeQueryPackageReq req;
+	uv_write_t* write_req;
+	uv_buf_t buf;
 
+	buf = uv_buf_init(req.toBuf(), req.getSize());
+
+	write_req = (uv_write_t*)malloc(sizeof *write_req);
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+}
 
 void CNodeManagerDlg::OnBnClickedButtonCommand2()
 {
 	// TODO: 在此添加控件通知处理程序代码
 }
+
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
 	buf->base = (char*)malloc(suggested_size);
 	buf->len = (ULONG)suggested_size;
 
 }
+
 static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 {
 	switch ((uchar)buf->base[2])
@@ -325,16 +322,44 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			}
 			break;
 		}
+		case 0xF2:
+		{
+			if (((uchar)buf->base[5]) == 0xFF && ((uchar)buf->base[6]) == 0xFF)
+			{
+				CNodeQueryEndPackageAck ack;
+				ack.fromBuf(buf->base);
+				if (ack.valid())
+				{
+					CString str;
+					str.Format("%d", nread);
+					AfxMessageBox(str);
+				}
+			}
+			else
+			{
+				CNodeQueryPackageAck ack;
+				ack.fromBuf(buf->base, nread);
+				if (ack.valid())
+				{
+					CString str;
+					str.Format("%d", nread);
+					AfxMessageBox(str);
+				}
+			}
+			break;
+		}
 		default:
 		{
 			break;
 		}
 	}
 }
-static void connect_cb(uv_connect_t* conn_req, int status) {
-	uv_read_start((uv_stream_t*)&tcp_handle, echo_alloc, after_read);
 
+static void connect_cb(uv_connect_t* conn_req, int status)
+{
+	uv_read_start((uv_stream_t*)&tcp_handle, echo_alloc, after_read);
 }
+
 DWORD WINAPI ThreadProc(LPVOID lpParam)
 {
 	struct sockaddr_in addr;
@@ -350,4 +375,16 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 void CNodeManagerDlg::OnBnClickedButtonConn()
 {
 	hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
+}
+
+void CNodeManagerDlg::OnBnClickedButtonQuick()
+{
+	CNodeQuickQueryPackageReq req;
+	uv_write_t* write_req;
+	uv_buf_t buf;
+
+	buf = uv_buf_init(req.toBuf(), req.getSize());
+
+	write_req = (uv_write_t*)malloc(sizeof *write_req);
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 }
