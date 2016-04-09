@@ -155,7 +155,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
 		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
-		uv_run(uv_default_loop(), UV_RUN_NOWAIT);
+		uv_run(&loop, UV_RUN_NOWAIT);
 		break;
 	}
 	case 0x02:
@@ -168,7 +168,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
 		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
-		uv_run(uv_default_loop(), UV_RUN_NOWAIT);
+		uv_run(&loop, UV_RUN_NOWAIT);
 		break;
 	}
 	}

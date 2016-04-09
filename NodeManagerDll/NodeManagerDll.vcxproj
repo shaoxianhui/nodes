@@ -156,6 +156,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AllNodes.h" />
+    <ClInclude Include="CommandPackageAck.h" />
     <ClInclude Include="CommandPackageReq.h" />
     <ClInclude Include="CommandPackageReqData.h" />
     <ClInclude Include="common.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="NodeQueryEndPackageAck.h" />
     <ClInclude Include="NodeQueryPackageAck.h" />
     <ClInclude Include="NodeQueryPackageReq.h" />
+    <ClInclude Include="NodeQuickQueryEndPackageAck.h" />
     <ClInclude Include="NodeQuickQueryPackageAck.h" />
     <ClInclude Include="NodeQuickQueryPackageReq.h" />
     <ClInclude Include="OnOffPackageData.h" />
@@ -192,6 +194,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AllNodes.cpp" />
+    <ClCompile Include="CommandPackageAck.cpp" />
     <ClCompile Include="CommandPackageReq.cpp" />
     <ClCompile Include="CommandPackageReqData.cpp" />
     <ClCompile Include="CountThread.cpp" />
@@ -224,6 +227,7 @@
     <ClCompile Include="NodeQueryEndPackageAck.cpp" />
     <ClCompile Include="NodeQueryPackageAck.cpp" />
     <ClCompile Include="NodeQueryPackageReq.cpp" />
+    <ClCompile Include="NodeQuickQueryEndPackageAck.cpp" />
     <ClCompile Include="NodeQuickQueryPackageAck.cpp" />
     <ClCompile Include="NodeQuickQueryPackageReq.cpp" />
     <ClCompile Include="OnOffPackageData.cpp" />

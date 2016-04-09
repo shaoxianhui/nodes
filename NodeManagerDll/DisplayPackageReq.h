@@ -3,7 +3,7 @@
 #include "Util.h"
 #pragma pack(push)
 #pragma pack(1)
-class CDisplayPackageReq
+class NODEMANAGERDLL_API CDisplayPackageReq
 {
 public:
 	CDisplayPackageReq();
@@ -16,17 +16,50 @@ public:
 	CDisplayPackageReqData* data = NULL;
 	uchar check = 0x00;
 public:
-	void newPackage(CDisplayPackageReqData* node, int num, char* buf, int* len)
+	void toBuf(CDisplayPackageReqData* node, int num, char* buf, int* len)
 	{
-		data = new CDisplayPackageReqData[num];
-		memcpy(data, node, num);
-		length = num * sizeof(CDisplayPackageReqData) + sizeof(cmdtype);
-		fillCheck();
-		*len = length + 5;
-		memcpy(buf, this, 6);
-		memcpy(buf + 6, data, num * sizeof(CDisplayPackageReqData));
-		buf[*len - 1] = check;
+		if (node != NULL)
+		{
+			if (data != NULL)
+				delete[] data;
+			data = new CDisplayPackageReqData[num];
+			memcpy(data, node, num * sizeof(CDisplayPackageReqData));
+			length = num * sizeof(CDisplayPackageReqData) + sizeof(cmdtype);
+			check = fillCheck();
+		}
+		if (buf != NULL)
+		{
+			*len = length + 6;
 
+			memcpy(buf, this, 6);
+			memcpy(buf + 6, data, getCount() * sizeof(CDisplayPackageReqData));
+			check = fillCheck();
+			buf[*len - 1] = check;
+		}
+	}
+	void fromBuf(char* buf)
+	{
+		memcpy(this, buf, 6);
+
+		int num = getCount();
+		if (data != NULL)
+			delete[] data;
+		data = new CDisplayPackageReqData[num];
+
+		memcpy(data, buf + 6, num * sizeof(CDisplayPackageReqData));
+		check = buf[getSize() - 1];
+	}
+	int getCount()
+	{
+		return (length - sizeof(cmdtype)) / sizeof(CDisplayPackageReqData);
+	}
+	int getSize()
+	{
+		return length + 6;
+	}
+	bool valid()
+	{
+		return check == fillCheck();
 	}
 private:
 	uchar fillCheck()
@@ -42,7 +75,7 @@ private:
 		{
 			sum += buf[i];
 		}
-		return check = sum;
+		return sum;
 	}
 };
 #pragma pack(pop)

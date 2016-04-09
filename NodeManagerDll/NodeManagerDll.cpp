@@ -38,6 +38,13 @@ NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsi
 	CTcpThread::GetInstance();
 	CTimerThread::GetInstance();
 	CCountThread::GetInstance();
+	for (int i = 0; i < 71; i++)
+	{
+		CHartPackageReq req;
+		req.data.UID[0] = i;
+		CAllNodes::GetInstance()->insertNode(&req);
+	}
+
 }
 NODEMANAGERDLL_API void StartGPRS(void)
 {

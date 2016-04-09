@@ -6,6 +6,8 @@
 #include "Util.h"
 #include "NodeInfoList.h"
 #include <time.h>
+#include "NodeQueryPackageAck.h"
+#include "NodeQuickQueryPackageAck.h"
 using namespace std;
 class CAllNodes
 {
@@ -21,7 +23,7 @@ public:
 		static CAllNodes instance;
 		return &instance;
 	}
-	void insertNode(CHartPackageReq* req, uv_udp_t* handle, const sockaddr* addr)
+	void insertNode(CHartPackageReq* req, uv_udp_t* handle = NULL, const sockaddr* addr = NULL)
 	{
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
 		NODE_MAP::iterator iter = allNodes.find(uid);
@@ -45,7 +47,8 @@ public:
 		info.info.setOnline();
 		time(&info.timestamp);
 		allNodes[uid] = info;
-		handle->data = &allNodes[uid];
+		if(handle != NULL)
+			handle->data = &allNodes[uid];
 	}
 	CNodeInfoWithSocket* findNode(uchar UID[12])
 	{
@@ -83,6 +86,60 @@ public:
 		}
 		ptrNodeInfoList->nodeNum = 0;
 	}
+	int getNodeQueryPackageAck(CNodeQueryPackageAck* ack, int* len)
+	{
+		int num = (int)getCount();
+		num = ceil((float)num / MAX_NODE_FRAME);
+		num = min(num, *len);
+		CNodeInfo data[MAX_NODE_FRAME];
+		ushort numFrame = 0;
+		int ret = 0;
+		if (num > 0)
+		{
+			NODE_MAP::iterator it;
+			int count = 0;
+			for (it = allNodes.begin(); it != allNodes.end(); it++)
+			{
+				data[count++] = it->second.info;
+				if (count == MAX_NODE_FRAME)
+				{
+					//生成一个包
+					ack[numFrame].toBuf(numFrame, data, MAX_NODE_FRAME);
+					ret += MAX_NODE_FRAME;
+					count = 0;
+					numFrame++;
+					if (numFrame == num)
+						break;
+				}
+			}
+			if (count > 0 && count < MAX_NODE_FRAME && numFrame < num)
+			{
+				//生成一个不完整包
+				ack[numFrame].toBuf(numFrame, data, count);
+				ret += count;
+				count = 0;
+				numFrame++;
+			}
+			*len = numFrame;
+		}
+		return ret;
+	}
+	int getNodeQucikQueryPackageAck(CNodeQuickQueryPackageAck* ack, int* len)
+	{
+		int node_num = getCount();
+		int chars_num = ceil((float)node_num / 8);
+		int num = ceil((float)chars_num / MAX_CHARS_FRAME);
+		num = min(num, *len);
+		ushort numFrame = 0;
+		if (num == 1)
+		{
+			//生成一个包
+			ack[numFrame].toBuf(0, quickTable, chars_num);
+			*len = 1;
+		}
+		return node_num;
+	}
+	
 	void updateQuickTable(CNodeInfo* node)
 	{
 		quickTable[node->SN / 8] = quickTable[node->SN / 8] | ((node->allStatus & 0x01) << (node->SN % 8));

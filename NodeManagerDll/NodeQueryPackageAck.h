@@ -16,25 +16,41 @@ public:
 	CNodeInfo* data = NULL;
 	uchar check = 0x00;
 public:
-	void toBuf(ushort frame, CNodeInfo* node, int num, char* buf, int* len)
+	void toBuf(ushort frame, CNodeInfo* node, int num, char* buf = NULL, int* len = NULL)
 	{
-		data = new CNodeInfo[num];
-		memcpy(data, node, num);
-		length = num * sizeof(CNodeInfo) + sizeof(numFrame);
-		numFrame = frame;
-		*len = length + 6;
-		memcpy(buf, this, 7);
-		memcpy(buf + 7, data, num * sizeof(CNodeInfo));
-		check = fillCheck();
-		buf[*len - 1] = check;
+		if (node != NULL)
+		{
+			if (data != NULL)
+				delete[] data;
+			data = new CNodeInfo[num];
+			memcpy(data, node, num * sizeof(CNodeInfo));
+			length = num * sizeof(CNodeInfo) + sizeof(numFrame);
+			numFrame = frame;
+		}
+		if (buf != NULL)
+		{
+			*len = length + 6;
+			memcpy(buf, this, 7);
+			memcpy(buf + 7, data, getCount() * sizeof(CNodeInfo));
+			check = fillCheck();
+			buf[*len - 1] = check;
+		}
 	}
-	void fromBuf(char* buf, int len)
+	void fromBuf(char* buf)
 	{ 
-		int num = (len - 6 - sizeof(numFrame)) / sizeof(CNodeInfo);
-		data = new CNodeInfo[num];
 		memcpy(this, buf, 7);
+
+		int num = getCount();
+		if (data != NULL)
+			delete[] data;
+		data = new CNodeInfo[num];
+		
 		memcpy(data, buf + 7, num * sizeof(CNodeInfo));
-		check = buf[len - 1];
+		check = buf[getSize() - 1];
+	}
+	int getCount()
+	{
+		return (length - sizeof(numFrame)) / sizeof(CNodeInfo);
 	}
 	int getSize() 
 	{ 

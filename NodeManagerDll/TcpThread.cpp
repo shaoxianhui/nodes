@@ -10,6 +10,12 @@
 #include "NodeQueryPackageAck.h"
 #include "NodeQueryEndPackageAck.h"
 #include "NodeQuickQueryPackageReq.h"
+#include "NodeQuickQueryEndPackageAck.h"
+#include "OnOffPackageReq.h"
+#include "AllNodes.h"
+#include "CommandPackageAck.h"
+#include "DisplayPackageReq.h"
+
 typedef struct {
 	uv_write_t req;
 	uv_buf_t buf;
@@ -91,20 +97,28 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			req.fromBuf(buf->base);
 			if (req.valid())
 			{
-				/*CNodeQueryPackageAck ack;
-				CNodeInfo n[4];
-				char buf[1024];
-				int len;
-				ack.toBuf(1, n, 4, buf, &len);
-				write_req_t *wr;
-				wr = (write_req_t*)malloc(sizeof *wr);
-				wr->buf = uv_buf_init(buf, ack.getSize());
-
-				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+				CNodeQueryPackageAck acks[4];
+				int len = 4;
+				int count = 0;
+				count = CAllNodes::GetInstance()->getNodeQueryPackageAck(acks, &len);
+				for (int i = 0; i < len; i++)
 				{
-					FATAL("uv_write failed");
-				}*/
+					int buf_len;
+					char buf[1024];
+					acks[i].toBuf(0, NULL, 0, buf, &buf_len);
+
+						write_req_t *wr;
+						wr = (write_req_t*)malloc(sizeof *wr);
+						wr->buf = uv_buf_init(buf, acks[i].getSize());
+
+						if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+						{
+							FATAL("uv_write failed");
+						}
+					
+				}
 				CNodeQueryEndPackageAck ack;
+				ack.totalNodeNum = 0;
 				write_req_t *wr;
 				wr = (write_req_t*)malloc(sizeof *wr);
 				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
@@ -116,26 +130,95 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			}
 			break;
 		}
-		case 0xF3:
+		case 0x03:
 		{
 			CNodeQuickQueryPackageReq req;
 			req.fromBuf(buf->base);
 			if (req.valid())
 			{
-				/*CNodeQueryPackageAck ack;
-				CNodeInfo n[4];
-				char buf[1024];
-				int len;
-				ack.toBuf(1, n, 4, buf, &len);
+				CNodeQuickQueryPackageAck acks[4];
+				int len = 4;
+				int count = 0;
+				count = CAllNodes::GetInstance()->getNodeQucikQueryPackageAck(acks, &len);
+				for (int i = 0; i < len; i++)
+				{
+					int buf_len;
+					char buf[1024];
+					acks[i].toBuf(0, NULL, 0, buf, &buf_len);
+
+					write_req_t *wr;
+					wr = (write_req_t*)malloc(sizeof *wr);
+					wr->buf = uv_buf_init(buf, acks[i].getSize());
+
+					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+					{
+						FATAL("uv_write failed");
+					}
+				}
+				CNodeQuickQueryEndPackageAck ack;
+				ack.totalNodeNum = count;
 				write_req_t *wr;
 				wr = (write_req_t*)malloc(sizeof *wr);
-				wr->buf = uv_buf_init(buf, ack.getSize());
+				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
 
 				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
 				{
-				FATAL("uv_write failed");
-				}*/
-				CNodeQueryEndPackageAck ack;
+					FATAL("uv_write failed");
+				}
+			}
+			break;
+		}
+		case 0x04:
+		{
+			switch ((uchar)buf->base[5])
+			{
+			case 0x01:
+			{
+				COnOffPackageReq req;
+				req.fromBuf(buf->base);
+				if (req.valid())
+				{
+					CCommandPackageAck ack;
+					ack.data = 1;
+					write_req_t *wr;
+					wr = (write_req_t*)malloc(sizeof *wr);
+					wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
+
+					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+					{
+						FATAL("uv_write failed");
+					}
+				}
+				break;
+			}
+			case 0x02:
+			{
+				CDisplayPackageReq req;
+				req.fromBuf(buf->base);
+				if (req.valid())
+				{
+					CCommandPackageAck ack;
+					ack.data = 1;
+					write_req_t *wr;
+					wr = (write_req_t*)malloc(sizeof *wr);
+					wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
+
+					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+					{
+						FATAL("uv_write failed");
+					}
+				}
+				break;
+			}
+			default:
+				break;
+			}
+			COnOffPackageReq req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+				CCommandPackageAck ack;
+				ack.data = 1;
 				write_req_t *wr;
 				wr = (write_req_t*)malloc(sizeof *wr);
 				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());

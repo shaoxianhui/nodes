@@ -3,7 +3,7 @@
 #include "CommandPackageReqData.h"
 #pragma pack(push)
 #pragma pack(1)
-class CDisplayPackageReqData
+class NODEMANAGERDLL_API CDisplayPackageReqData
 {
 public:
 	CDisplayPackageReqData();

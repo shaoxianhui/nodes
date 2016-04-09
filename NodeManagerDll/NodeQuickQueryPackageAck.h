@@ -15,19 +15,49 @@ public:
 	uchar* data = NULL;
 	uchar check = 0x00;
 public:
-	void newPackage(ushort frame, CNodeInfo* node, int num, char* buf, int* len)
+	void toBuf(ushort frame, uchar* quickTable, int num, char* buf = NULL, int* len = NULL)
 	{
-		num = ceil((float)num / 8);
-		data = new uchar[num];
-		memcpy(data, node, num);
-		length = num * sizeof(uchar) + sizeof(numFrame);
-		numFrame = frame;
-		fillCheck();
-		*len = length + 6;
-		memcpy(buf, this, 7);
-		memcpy(buf + 7, data, num * sizeof(char));
-		buf[*len - 1] = check;
+		if (quickTable != NULL)
+		{
+			if (data != NULL)
+				delete[] data;
+			data = new uchar[num];
+			memcpy(data, quickTable, num);
+			length = num * sizeof(uchar) + sizeof(numFrame);
+			numFrame = frame;
+		}
+		if (buf != NULL)
+		{
+			*len = length + 6;
+			memcpy(buf, this, 7);
+			memcpy(buf + 7, data, getCount() * sizeof(char));
+			check = fillCheck();
+			buf[*len - 1] = check;
+		}
+	}
+	void fromBuf(char* buf)
+	{
+		memcpy(this, buf, 7);
 
+		int num = getCount();
+		if (data != NULL)
+			delete[] data;
+		data = new uchar[num];
+
+		memcpy(data, buf + 7, num * sizeof(uchar));
+		check = buf[getSize() - 1];
+	}
+	int getCount()
+	{
+		return (length - sizeof(numFrame)) / sizeof(uchar);
+	}
+	int getSize()
+	{
+		return length + 6;
+	}
+	bool valid()
+	{
+		return check == fillCheck();
 	}
 private:
 	uchar fillCheck()
@@ -43,7 +73,7 @@ private:
 		{
 			sum += buf[i];
 		}
-		return check = sum;
+		return sum;
 	}
 };
 #pragma pack(pop)

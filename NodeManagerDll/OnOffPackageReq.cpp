@@ -9,4 +9,6 @@ COnOffPackageReq::COnOffPackageReq()
 
 COnOffPackageReq::~COnOffPackageReq()
 {
+	if (data != NULL)
+		delete[] data;
 }

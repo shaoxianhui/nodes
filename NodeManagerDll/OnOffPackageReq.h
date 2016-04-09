@@ -16,17 +16,50 @@ public:
 	COnOffPackageData* data = NULL;
 	uchar check = 0x00;
 public:
-	void newPackage(COnOffPackageData* node, int num, char* buf, int* len)
+	void toBuf(COnOffPackageData* node, int num, char* buf, int* len)
 	{
-		data = new COnOffPackageData[num];
-		memcpy(data, node, num);
-		length = num * sizeof(COnOffPackageData) + sizeof(cmdtype);
-		fillCheck();
-		*len = length + 5;
-		memcpy(buf, this, 6);
-		memcpy(buf + 6, data, num * sizeof(COnOffPackageData));
-		buf[*len - 1] = check;
+		if (node != NULL)
+		{
+			if (data != NULL)
+				delete[] data;
+			data = new COnOffPackageData[num];
+			memcpy(data, node, num * sizeof(COnOffPackageData));
+			length = num * sizeof(COnOffPackageData) + sizeof(cmdtype);
+			check = fillCheck();
+		}
+		if (buf != NULL)
+		{
+			*len = length + 6;
 
+			memcpy(buf, this, 6);
+			memcpy(buf + 6, data, getCount() * sizeof(COnOffPackageData));
+			check = fillCheck();
+			buf[*len - 1] = check;
+		}
+	}
+	void fromBuf(char* buf)
+	{
+		memcpy(this, buf, 6);
+
+		int num = getCount();
+		if (data != NULL)
+			delete[] data;
+		data = new COnOffPackageData[num];
+
+		memcpy(data, buf + 6, num * sizeof(COnOffPackageData));
+		check = buf[getSize() - 1];
+	}
+	int getCount()
+	{
+		return (length - sizeof(cmdtype)) / sizeof(COnOffPackageData);
+	}
+	int getSize()
+	{
+		return length + 6;
+	}
+	bool valid()
+	{
+		return check == fillCheck();
 	}
 private:
 	uchar fillCheck()
@@ -42,7 +75,7 @@ private:
 		{
 			sum += buf[i];
 		}
-		return check = sum;
+		return sum;
 	}
 };
 #pragma pack(pop)

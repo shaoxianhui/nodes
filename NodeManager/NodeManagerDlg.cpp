@@ -20,6 +20,10 @@
 #include <uv.h>
 #include <task.h>
 #include <NodeQuickQueryPackageReq.h>
+#include <NodeQuickQueryEndPackageAck.h>
+#include <OnOffPackageReq.h>
+#include <CommandPackageAck.h>
+#include <DisplayPackageReq.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -296,7 +300,20 @@ void CNodeManagerDlg::OnBnClickedButtonInfo2()
 
 void CNodeManagerDlg::OnBnClickedButtonCommand2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	//COnOffPackageReq req;
+	CDisplayPackageReq req;
+	int len = 0;
+	uv_write_t* write_req;
+	uv_buf_t write_buf;
+	char buf[1024];
+	CDisplayPackageReqData nodes[4];
+
+	nodes[0].disp.dispNum = 1;
+	req.toBuf(nodes, 4, buf, &len);
+	write_buf = uv_buf_init(buf, len);
+
+	write_req = (uv_write_t*)malloc(sizeof *write_req);
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
 }
 
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
@@ -308,18 +325,22 @@ static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf
 
 static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 {
-	switch ((uchar)buf->base[2])
+	int offset = 0;
+	while (nread - offset > 0)
 	{
+		switch ((uchar)buf->base[offset + 2])
+		{
 		case 0xF1:
 		{
 			CVerificationPackageAck ack;
-			ack.fromBuf(buf->base);
+			ack.fromBuf(buf->base + offset);
 			if (ack.valid())
 			{
 				CString str;
 				str.Format("%d", ack.cert);
 				AfxMessageBox(str);
 			}
+			offset += ack.getSize();
 			break;
 		}
 		case 0xF2:
@@ -327,30 +348,74 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			if (((uchar)buf->base[5]) == 0xFF && ((uchar)buf->base[6]) == 0xFF)
 			{
 				CNodeQueryEndPackageAck ack;
-				ack.fromBuf(buf->base);
+				ack.fromBuf(buf->base + offset);
 				if (ack.valid())
 				{
 					CString str;
-					str.Format("%d", nread);
+					str.Format("%d", ack.getSize());
 					AfxMessageBox(str);
 				}
+				offset += ack.getSize();
 			}
 			else
 			{
 				CNodeQueryPackageAck ack;
-				ack.fromBuf(buf->base, nread);
+				ack.fromBuf(buf->base + offset);
 				if (ack.valid())
 				{
 					CString str;
-					str.Format("%d", nread);
+					str.Format("%d", ack.getSize());
 					AfxMessageBox(str);
 				}
+				offset += ack.getSize();
 			}
+			break;
+		}
+		case 0xF3:
+		{
+			if (((uchar)buf->base[5]) == 0xFF && ((uchar)buf->base[6]) == 0xFF)
+			{
+				CNodeQuickQueryEndPackageAck ack;
+				ack.fromBuf(buf->base + offset);
+				if (ack.valid())
+				{
+					CString str;
+					str.Format("%d", ack.totalNodeNum);
+					AfxMessageBox(str);
+				}
+				offset += ack.getSize();
+			}
+			else
+			{
+				CNodeQuickQueryPackageAck ack;
+				ack.fromBuf(buf->base + offset);
+				if (ack.valid())
+				{
+					CString str;
+					str.Format("%d", ack.getSize());
+					AfxMessageBox(str);
+				}
+				offset += ack.getSize();
+			}
+			break;
+		}
+		case 0xF4:
+		{
+			CCommandPackageAck ack;
+			ack.fromBuf(buf->base + offset);
+			if (ack.valid())
+			{
+				CString str;
+				str.Format("%d", ack.data);
+				AfxMessageBox(str);
+			}
+			offset += ack.getSize();
 			break;
 		}
 		default:
 		{
 			break;
+		}
 		}
 	}
 }
