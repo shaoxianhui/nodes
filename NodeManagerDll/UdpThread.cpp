@@ -12,6 +12,8 @@
 #include "SuccessPackageAck.h"
 #include "ErrorPackageAck.h"
 #include "CommandPackageReq.h"
+#include "OnOffPackageReq.h"
+#include "DisplayPackageReq.h"
 extern int GPRSPort;
 extern bool isStart;
 static uv_udp_t udp_server;
@@ -171,5 +173,41 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		uv_run(&loop, UV_RUN_NOWAIT);
 		break;
 	}
+	}
+}
+
+void TCPOnOffNodeCmdSend(COnOffPackageReq* req)
+{
+	COnOffPackageData* data = req->data;
+	int count = req->getCount();
+	for (int i = 0; i < count; i++)
+	{
+		uv_udp_send_t* send_req = new uv_udp_send_t;
+		CSwitchPackageReq req;
+		req.sw = data[i].sw;
+		uv_buf_t buf;
+		buf = uv_buf_init(req.toBuf(), req.getSize());
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(data[i].UID);
+		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		info->info.setFail();
+		uv_run(&loop, UV_RUN_NOWAIT);
+	}
+}
+
+void TCPDisplayNodeCmdSend(CDisplayPackageReq* req)
+{
+	CDisplayPackageReqData* data = req->data;
+	int count = req->getCount();
+	for (int i = 0; i < count; i++)
+	{
+		uv_udp_send_t* send_req = new uv_udp_send_t;
+		CCommandPackageReq req;
+		memcpy(&req.data, &data[i].disp, sizeof(data[i].disp));
+		uv_buf_t buf;
+		buf = uv_buf_init(req.toBuf(), req.getSize());
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(data[i].UID);
+		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		info->info.setFail();
+		uv_run(&loop, UV_RUN_NOWAIT);
 	}
 }

@@ -250,11 +250,6 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			str = m_list.GetItemText(i, 0);
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
-
-			/*uchar data[1];
-			data[0] = 0;
-			NodeCmdSend(&node, 1, 1, data);
-			AfxMessageBox(str);*/
 			CCommandPackageReqData data;
 			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);
@@ -306,10 +301,10 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 	uv_write_t* write_req;
 	uv_buf_t write_buf;
 	char buf[1024];
-	CDisplayPackageReqData nodes[4];
-
+	CDisplayPackageReqData nodes[1];
+	memset(nodes[0].UID, 0, 12);
 	nodes[0].disp.dispNum = 1;
-	req.toBuf(nodes, 4, buf, &len);
+	req.toBuf(nodes, 1, buf, &len);
 	write_buf = uv_buf_init(buf, len);
 
 	write_req = (uv_write_t*)malloc(sizeof *write_req);

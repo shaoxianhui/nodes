@@ -15,7 +15,8 @@
 #include "AllNodes.h"
 #include "CommandPackageAck.h"
 #include "DisplayPackageReq.h"
-
+extern void TCPDisplayNodeCmdSend(CDisplayPackageReq* req);
+extern void TCPOnOffNodeCmdSend(COnOffPackageReq* req);
 typedef struct {
 	uv_write_t req;
 	uv_buf_t buf;
@@ -188,6 +189,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					{
 						FATAL("uv_write failed");
 					}
+					TCPOnOffNodeCmdSend(&req);
 				}
 				break;
 			}
@@ -207,6 +209,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					{
 						FATAL("uv_write failed");
 					}
+					TCPDisplayNodeCmdSend(&req);
 				}
 				break;
 			}
