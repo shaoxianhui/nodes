@@ -13,6 +13,7 @@ class CAllNodes
 {
 private:
 	map<string, CNodeInfoWithSocket> allNodes;
+	map<string, CNodeInfoWithSocket*> allNodesKeySocket;
 	uchar quickTable[1024];
 private:
 	CAllNodes();
@@ -23,7 +24,7 @@ public:
 		static CAllNodes instance;
 		return &instance;
 	}
-	void insertNode(CHartPackageReq* req, uv_udp_t* handle = NULL, const sockaddr* addr = NULL)
+	void insertNode(CHartPackageReq* req, const sockaddr* addr = NULL)
 	{
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
 		NODE_MAP::iterator iter = allNodes.find(uid);
@@ -31,7 +32,6 @@ public:
 		memcpy(info.info.UID, req->data.UID, 12);
 		memcpy(info.info.phoneNum, req->data.phoneNum, 11);
 		if (addr != NULL) info.addr = *addr;
-		if (handle != NULL) info.handle = handle;
 		if (iter != allNodes.end())
 		{
 			//¸üÐÂ
@@ -47,13 +47,17 @@ public:
 		info.info.setOnline();
 		time(&info.timestamp);
 		allNodes[uid] = info;
-		if(handle != NULL)
-			handle->data = &allNodes[uid];
+		allNodesKeySocket[CUtil::SockaddrToString(&info.addr)] = &allNodes[uid];
 	}
-	CNodeInfoWithSocket* findNode(uchar UID[12])
+	CNodeInfoWithSocket* findNodeByUID(uchar UID[12])
 	{
 		string uid = CUtil::UIDtoString((char*)UID);
 		return &allNodes[uid];
+	}
+	CNodeInfoWithSocket* findNodeBySock(const struct sockaddr* addr)
+	{
+		string key = CUtil::SockaddrToString(addr);
+		return allNodesKeySocket[key];
 	}
 	size_t getCount()
 	{

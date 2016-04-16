@@ -14,6 +14,7 @@
 #include "CommandPackageReq.h"
 #include "OnOffPackageReq.h"
 #include "DisplayPackageReq.h"
+#include "NodeInfoWithSocket.h"
 extern int GPRSPort;
 extern bool isStart;
 static uv_udp_t udp_server;
@@ -31,7 +32,6 @@ static void sv_send_cb(uv_udp_send_t* req, int status)
 	free(req);
 }
 
-//static uv_udp_t client;
 static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, const struct sockaddr* addr, unsigned flags)
 {
 	if (nread <= 0)
@@ -46,7 +46,7 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			if (req.valid() == TRUE)
 			{
 				// 插入或者更新节点信息
-				CAllNodes::GetInstance()->insertNode(&req, handle, addr);
+				CAllNodes::GetInstance()->insertNode(&req, addr);
 				//申请发送请求
 				uv_udp_send_t* send_req;
 				send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
@@ -69,11 +69,8 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			if (ack.valid() == TRUE)
 			{
 				// 插入或者更新节点信息
-				if (handle->data != NULL)
-				{
-					CNodeInfo* node = (CNodeInfo*)handle->data;
-					node->setSuccess();
-				}
+				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySock(addr);
+				node->info.setSuccess();
 			}
 			break;
 		}
@@ -84,12 +81,8 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			ack.fromBuf(rcvbuf->base);
 			if (ack.valid() == TRUE)
 			{
-				// 插入或者更新节点信息
-				if (handle->data != NULL)
-				{
-					CNodeInfo* node = (CNodeInfo*)handle->data;
-					node->setSuccess();
-				}
+				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySock(addr);
+				node->info.setSuccess();
 			}
 			break;
 		}
@@ -154,10 +147,9 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		req.sw = ptrData[0];
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
-		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
-		uv_run(&loop, UV_RUN_NOWAIT);
 		break;
 	}
 	case 0x02:
@@ -167,10 +159,9 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		memcpy(&req.data, ptrData, dataLen);
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(nodeInfo->UID);
-		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
-		uv_run(&loop, UV_RUN_NOWAIT);
 		break;
 	}
 	}
@@ -187,8 +178,8 @@ void TCPOnOffNodeCmdSend(COnOffPackageReq* req)
 		req.sw = data[i].sw;
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(data[i].UID);
-		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
 		uv_run(&loop, UV_RUN_NOWAIT);
 	}
@@ -205,8 +196,8 @@ void TCPDisplayNodeCmdSend(CDisplayPackageReq* req)
 		memcpy(&req.data, &data[i].disp, sizeof(data[i].disp));
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNode(data[i].UID);
-		uv_udp_send(send_req, info->handle, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
 		info->info.setFail();
 		uv_run(&loop, UV_RUN_NOWAIT);
 	}

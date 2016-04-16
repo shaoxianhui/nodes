@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "common.h"
+#include "uv.h"
 using namespace std;
 class CUtil
 {
@@ -34,6 +35,19 @@ public:
 			sum += buf[i];
 		}
 		return sum;
+	}
+	static string SockaddrToString(const struct sockaddr* addr)
+	{
+		unsigned short port;
+		char* pPort = (char*)&port;
+		pPort[0] = addr->sa_data[1];
+		pPort[1] = addr->sa_data[0];
+
+		char buf[64] = { 0x00 };
+		uv_ip4_name((sockaddr_in*)addr, buf, 64);
+		sprintf_s(buf, "%s:%d", buf, port);
+		string ret = buf;
+		return ret;
 	}
 };
 

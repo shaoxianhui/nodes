@@ -8,7 +8,6 @@ public:
 	~CNodeInfoWithSocket();
 public:
 	CNodeInfo info;
-	uv_udp_t* handle;
 	sockaddr  addr;
 	time_t    timestamp;
 };
