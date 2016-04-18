@@ -28,7 +28,6 @@ CTimerThread::CTimerThread()
 	hThead = CreateThread(NULL, 0, TimerThreadProc, NULL, 0, &dwThreadID);
 }
 
-
 CTimerThread::~CTimerThread()
 {
 }

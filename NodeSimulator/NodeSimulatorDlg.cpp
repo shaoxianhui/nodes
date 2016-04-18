@@ -176,7 +176,7 @@ static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 	buf->base = slab;
 	buf->len = sizeof(slab);
 }
-static void cl_send_cb1(uv_udp_send_t* req, int status)
+static void cl_send_cb(uv_udp_send_t* req, int status)
 {
 	free(req);
 }
@@ -212,7 +212,7 @@ static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 				uv_buf_t sndbuf;
 				sndbuf = uv_buf_init(ack.toBuf(), ack.getSize());
 				//发送响应包
-				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb1);
+				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb);
 			}
 			break;
 		}
@@ -231,7 +231,7 @@ static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 				uv_buf_t sndbuf;
 				sndbuf = uv_buf_init(ack.toBuf(), ack.getSize());
 				//发送响应包
-				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb1);
+				uv_udp_send(send_req, handle, &sndbuf, 1, (struct sockaddr*) addr, cl_send_cb);
 			}
 		}
 		default:
@@ -240,20 +240,16 @@ static void cl_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 		}
 	}
 }
-static void cl_send_cb(uv_udp_send_t* req, int status)
-{
-	uv_udp_recv_start(req->handle, alloc_cb, cl_recv_cb);
-}
 
 DWORD WINAPI ThreadProc(LPVOID lpParam)
 {
-	CHartPackageReq req1;
-	req1.data.UID[0] = ((CNodeSimulatorDlg*)lpParam)->m_valUid;
-	req1.fillCheck();
-	if (req1.valid() == true)
+	CHartPackageReq req;
+	req.data.UID[0] = ((CNodeSimulatorDlg*)lpParam)->m_valUid;
+	req.fillCheck();
+	if (req.valid() == true)
 	{
 		struct sockaddr_in addr;
-		uv_udp_send_t req;
+		uv_udp_send_t* send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
 		uv_buf_t buf;
 #ifdef _DEBUG
 		uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
@@ -261,8 +257,9 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 		uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
 #endif // _DEBUG
 		uv_udp_init(uv_default_loop(), &client);	
-		buf = uv_buf_init((char*)&req1, req1.getSize());
-		uv_udp_send(&req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);
+		buf = uv_buf_init((char*)&req, req.getSize());
+		uv_udp_recv_start(&client, alloc_cb, cl_recv_cb);
+		uv_udp_send(send_req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);
 		uv_run(uv_default_loop(), UV_RUN_DEFAULT);
 		AfxMessageBox("线程结束");
 	}
@@ -308,8 +305,8 @@ void CNodeSimulatorDlg::SendHartPackage()
 	req.fillCheck();
 	buf = uv_buf_init((char*)&req, req.getSize());
 
-	uv_udp_send_t send_req;
-	uv_udp_send(&send_req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);
+	uv_udp_send_t* send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
+	uv_udp_send(send_req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);
 
 	uv_run(uv_default_loop(), UV_RUN_NOWAIT);
 }
