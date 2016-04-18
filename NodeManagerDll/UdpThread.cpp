@@ -36,14 +36,18 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 {
 	if (nread <= 0)
 		return;
+	CLog::GetInstance()->funLog(CUtil::SockaddrToString(addr));
 	switch ((uchar)rcvbuf->base[2])
 	{
 		//心跳
+#ifdef _DEBUG
+		case '1':
+#endif // _DEBUG
 		case 0x2B:
 		{
 			CHartPackageReq req;
 			req.fromBuf(rcvbuf->base);
-			if (req.valid() == TRUE)
+			//if (req.valid() == TRUE)
 			{
 				// 插入或者更新节点信息
 				CAllNodes::GetInstance()->insertNode(&req, addr);
@@ -69,8 +73,9 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			if (ack.valid() == TRUE)
 			{
 				// 插入或者更新节点信息
-				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySock(addr);
-				node->info.setSuccess();
+				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySocket(addr);
+				if (node != NULL)
+					node->info.setSuccess();
 			}
 			break;
 		}
@@ -81,8 +86,9 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			ack.fromBuf(rcvbuf->base);
 			if (ack.valid() == TRUE)
 			{
-				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySock(addr);
-				node->info.setSuccess();
+				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySocket(addr);
+				if(node != NULL)
+					node->info.setSuccess();
 			}
 			break;
 		}
@@ -91,12 +97,6 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			break;
 		}
 	}
-}
-static void sv_send_cb1(uv_udp_send_t* req, int status)
-{
-	CLog::GetInstance()->funLog("发送数据回调！");
-	uv_udp_recv_start(req->handle, alloc_cb, sv_recv_cb);
-	free(req);
 }
 
 DWORD WINAPI UdpThreadProc(LPVOID lpParam)
@@ -148,7 +148,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 		info->info.setFail();
 		break;
 	}
@@ -160,7 +160,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 		info->info.setFail();
 		break;
 	}
@@ -179,9 +179,8 @@ void TCPOnOffNodeCmdSend(COnOffPackageReq* req)
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 		info->info.setFail();
-		uv_run(&loop, UV_RUN_NOWAIT);
 	}
 }
 
@@ -197,8 +196,7 @@ void TCPDisplayNodeCmdSend(CDisplayPackageReq* req)
 		uv_buf_t buf;
 		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb1);
+		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 		info->info.setFail();
-		uv_run(&loop, UV_RUN_NOWAIT);
 	}
 }

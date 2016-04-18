@@ -266,14 +266,16 @@ static void write_cb(uv_write_t* req, int status) {
 
 void CNodeManagerDlg::OnBnClickedButtonVeri()
 {
-	CVerificationPackageReq req;
+	string s = getKey();
+	MessageBox(s.c_str());
+	/*CVerificationPackageReq req;
 	uv_write_t* write_req;
 	uv_buf_t buf;
 
 	buf = uv_buf_init(req.toBuf(), req.getSize());
 	
 	write_req = (uv_write_t*)malloc(sizeof *write_req);
-	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);*/
 }
 
 void CNodeManagerDlg::OnBnClickedButtonNum2()
@@ -423,7 +425,7 @@ static void connect_cb(uv_connect_t* conn_req, int status)
 DWORD WINAPI ThreadProc(LPVOID lpParam)
 {
 	struct sockaddr_in addr;
-	uv_ip4_addr("127.0.0.1", TEST_PORT + 1, &addr);
+	uv_ip4_addr("118.26.131.14", TEST_PORT + 1, &addr);
 
 	uv_tcp_init(uv_default_loop(), &tcp_handle);
 	uv_tcp_connect(&connect_req, &tcp_handle, (const struct sockaddr*) &addr, connect_cb);

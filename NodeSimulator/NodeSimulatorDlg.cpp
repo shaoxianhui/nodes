@@ -255,7 +255,11 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 		struct sockaddr_in addr;
 		uv_udp_send_t req;
 		uv_buf_t buf;
+#ifdef _DEBUG
 		uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
+#else
+		uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+#endif // _DEBUG
 		uv_udp_init(uv_default_loop(), &client);	
 		buf = uv_buf_init((char*)&req1, req1.getSize());
 		uv_udp_send(&req, &client, &buf, 1, (const struct sockaddr*) &addr, cl_send_cb);

@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+using namespace std;
 class CNodeInfo;
 class CNodeInfoList;
 #ifdef NODEMANAGERDLL_EXPORTS
@@ -23,7 +25,7 @@ NODEMANAGERDLL_API void NodeNumRequest(unsigned int *nodeNum);
 NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList);
 
 NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, unsigned char type, unsigned short dataLen, unsigned char *ptrData);
-
+NODEMANAGERDLL_API string getKey();
 #define CommomCode public:\
 void fromBuf(char* buf) { memcpy((char*)this, buf, getSize()); } \
 char* toBuf() { fillCheck(); return (char*)this; } \

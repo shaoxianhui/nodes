@@ -59,6 +59,27 @@ public:
 		string key = CUtil::SockaddrToString(addr);
 		return allNodesKeySocket[key];
 	}
+	CNodeInfoWithSocket* findNodeBySN(uint sn)
+	{
+		NODE_MAP::iterator it = allNodes.begin();
+		for (; it != allNodes.end(); it++)
+		{
+			if (it->second.info.SN == sn)
+				return &(it->second);
+		}
+		return NULL;
+	}
+	CNodeInfoWithSocket* findNodeBySocket(const struct sockaddr* addr)
+	{
+		string str_addr = CUtil::SockaddrToString(addr);
+		NODE_MAP::iterator it = allNodes.begin();
+		for (; it != allNodes.end(); it++)
+		{
+			if (CUtil::SockaddrToString(&it->second.addr) == str_addr)
+				return &(it->second);
+		}
+		return NULL;
+	}
 	size_t getCount()
 	{
 		return allNodes.size();
@@ -159,6 +180,16 @@ public:
 				iter->second.info.setOffline();
 			}
 		}
+	}
+	string getKey()
+	{
+		map<string, CNodeInfoWithSocket*>::iterator it = allNodesKeySocket.begin();
+		string s;
+		for (; it != allNodesKeySocket.end(); it++)
+		{
+			s += it->first + ":" + CUtil::UIDtoString((char*)it->second->info.UID) + "\n";
+		}
+		return s;
 	}
 };
 

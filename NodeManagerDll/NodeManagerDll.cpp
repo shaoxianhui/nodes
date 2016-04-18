@@ -75,4 +75,8 @@ NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList)
 {
 	CAllNodes::GetInstance()->fill(ptrNodeInfoList);
 }
+NODEMANAGERDLL_API string getKey()
+{
+	return CAllNodes::GetInstance()->getKey();
+}
 /////////////////////////////////////////////////////////////////////////////
