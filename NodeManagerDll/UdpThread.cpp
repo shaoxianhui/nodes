@@ -142,26 +142,33 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 	{
 	case 0x01:
 	{
-		uv_udp_send_t* send_req = new uv_udp_send_t;
-		CSwitchPackageReq req;
-		req.sw = ptrData[0];
-		uv_buf_t buf;
-		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
-		info->info.setFail();
+		if (info != NULL)
+		{
+			uv_udp_send_t* send_req = new uv_udp_send_t;
+			CSwitchPackageReq req;
+			req.sw = ptrData[0];
+			uv_buf_t buf;
+			buf = uv_buf_init(req.toBuf(), req.getSize());
+			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			info->info.setFail();
+		}
 		break;
 	}
 	case 0x02:
 	{
-		uv_udp_send_t* send_req = new uv_udp_send_t;
-		CCommandPackageReq req;
-		memcpy(&req.data, ptrData, dataLen);
-		uv_buf_t buf;
-		buf = uv_buf_init(req.toBuf(), req.getSize());
 		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(nodeInfo->UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
-		info->info.setFail();
+		if (info != NULL)
+		{
+			uv_udp_send_t* send_req = new uv_udp_send_t;
+			CCommandPackageReq req;
+			memcpy(&req.data, ptrData, dataLen);
+			uv_buf_t buf;
+			buf = uv_buf_init(req.toBuf(), req.getSize());
+			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			info->info.setFail();
+		}
+
 		break;
 	}
 	}
@@ -173,14 +180,25 @@ void TCPOnOffNodeCmdSend(COnOffPackageReq* req)
 	int count = req->getCount();
 	for (int i = 0; i < count; i++)
 	{
-		uv_udp_send_t* send_req = new uv_udp_send_t;
-		CSwitchPackageReq req;
-		req.sw = data[i].sw;
-		uv_buf_t buf;
-		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
-		info->info.setFail();
+		CNodeInfoWithSocket* info = NULL;
+		if (data[i].useSN == 1)
+		{
+			info = CAllNodes::GetInstance()->findNodeBySN(data[i].SN);
+		}
+		else
+		{
+			info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
+		}
+		if (info != NULL)
+		{
+			uv_udp_send_t* send_req = new uv_udp_send_t;
+			CSwitchPackageReq req;
+			req.sw = data[i].sw;
+			uv_buf_t buf;
+			buf = uv_buf_init(req.toBuf(), req.getSize());
+			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			info->info.setFail();
+		}
 	}
 }
 
@@ -190,13 +208,24 @@ void TCPDisplayNodeCmdSend(CDisplayPackageReq* req)
 	int count = req->getCount();
 	for (int i = 0; i < count; i++)
 	{
-		uv_udp_send_t* send_req = new uv_udp_send_t;
-		CCommandPackageReq req;
-		memcpy(&req.data, &data[i].disp, sizeof(data[i].disp));
-		uv_buf_t buf;
-		buf = uv_buf_init(req.toBuf(), req.getSize());
-		CNodeInfoWithSocket* info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
-		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
-		info->info.setFail();
+		CNodeInfoWithSocket* info = NULL;
+		if (data[i].useSN == 1)
+		{
+			info = CAllNodes::GetInstance()->findNodeBySN(data[i].SN);
+		}
+		else
+		{
+			info = CAllNodes::GetInstance()->findNodeByUID(data[i].UID);
+		}
+		if (info != NULL)
+		{
+			uv_udp_send_t* send_req = new uv_udp_send_t;
+			CCommandPackageReq req;
+			memcpy(&req.data, &data[i].disp, sizeof(data[i].disp));
+			uv_buf_t buf;
+			buf = uv_buf_init(req.toBuf(), req.getSize());
+			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			info->info.setFail();
+		}
 	}
 }
