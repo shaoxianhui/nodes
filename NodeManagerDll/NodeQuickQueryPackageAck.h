@@ -23,7 +23,7 @@ public:
 				delete[] data;
 			data = new uchar[num];
 			memcpy(data, quickTable, num);
-			length = num * sizeof(uchar) + sizeof(numFrame);
+			length = (ushort)(num * sizeof(uchar) + sizeof(numFrame));
 			numFrame = frame;
 		}
 		if (buf != NULL)

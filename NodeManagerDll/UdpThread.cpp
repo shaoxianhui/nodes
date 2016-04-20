@@ -47,7 +47,9 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 		{
 			CHartPackageReq req;
 			req.fromBuf(rcvbuf->base);
-			//if (req.valid() == TRUE)
+#ifndef _DEBUG
+			if (req.valid() == TRUE)
+#endif // _DEBUG
 			{
 				// 插入或者更新节点信息
 				CAllNodes::GetInstance()->insertNode(&req, addr);
