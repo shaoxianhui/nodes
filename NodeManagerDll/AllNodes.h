@@ -114,7 +114,7 @@ public:
 	int getNodeQueryPackageAck(CNodeQueryPackageAck* ack, int* len)
 	{
 		int num = (int)getCount();
-		num = ceil((float)num / MAX_NODE_FRAME);
+		num = (int)ceil((float)num / MAX_NODE_FRAME);
 		num = min(num, *len);
 		CNodeInfo data[MAX_NODE_FRAME];
 		ushort numFrame = 0;
@@ -151,9 +151,9 @@ public:
 	}
 	int getNodeQucikQueryPackageAck(CNodeQuickQueryPackageAck* ack, int* len)
 	{
-		int node_num = getCount();
-		int chars_num = ceil((float)node_num / 8);
-		int num = ceil((float)chars_num / MAX_CHARS_FRAME);
+		int node_num = (int)getCount();
+		int chars_num = (int)ceil((float)node_num / 8);
+		int num = (int)ceil((float)chars_num / MAX_CHARS_FRAME);
 		num = min(num, *len);
 		ushort numFrame = 0;
 		if (num == 1)

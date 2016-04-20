@@ -40,14 +40,16 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 	switch ((uchar)rcvbuf->base[2])
 	{
 		//心跳
-//#ifdef _DEBUG
+#ifdef _DEBUG
 		case '1':
-//#endif // _DEBUG
+#endif // _DEBUG
 		case 0x2B:
 		{
 			CHartPackageReq req;
 			req.fromBuf(rcvbuf->base);
+#ifndef _DEBUG
 			if (req.valid() == TRUE)
+#endif // _DEBUG
 			{
 				// 插入或者更新节点信息
 				CAllNodes::GetInstance()->insertNode(&req, addr);
