@@ -24,6 +24,7 @@
 #include <OnOffPackageReq.h>
 #include <CommandPackageAck.h>
 #include <DisplayPackageReq.h>
+#include <SwitchPackageReq.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -250,6 +251,8 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			str = m_list.GetItemText(i, 0);
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
+			//CSwitchPackageReq data;
+			//data.sw = 0;
 			CCommandPackageReqData data;
 			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);

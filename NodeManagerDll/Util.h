@@ -12,10 +12,10 @@ public:
 	static string UIDtoString(char* uid)
 	{
 		string s;
-		char temp[3];
+		char temp[3] = { 0x00 };
 		for (int i = 0; i < 12; i++)
 		{
-			sprintf_s(temp, "%02X", uid[i]);
+			sprintf_s(temp, "%02X", (uchar)uid[i]);
 			s += temp;
 		}
 		return s;
