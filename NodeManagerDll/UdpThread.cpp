@@ -89,8 +89,8 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 			if (ack.valid() == TRUE)
 			{
 				CNodeInfoWithSocket* node = CAllNodes::GetInstance()->findNodeBySocket(addr);
-				//if(node != NULL)
-					//node->info.setSuccess();
+				if(node != NULL)
+					node->info.setSuccess();
 			}
 			break;
 		}

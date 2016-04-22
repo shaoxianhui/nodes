@@ -240,7 +240,7 @@ void CNodeManagerDlg::OnBnClickedButtonStop()
 {
 	StopGPRS();
 }
-
+int sw = 0;
 void CNodeManagerDlg::OnBnClickedButtonCommand()
 {
 	CString str;
@@ -252,8 +252,10 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			//CSwitchPackageReq data;
-			//data.sw = 0;
+			//data.sw = (sw++)%2;
 			CCommandPackageReqData data;
+			data.dispNum = 120;
+			data.validNum = 3;
 			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);
 		}
