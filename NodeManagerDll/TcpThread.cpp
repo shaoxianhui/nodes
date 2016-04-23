@@ -217,21 +217,6 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			default:
 				break;
 			}
-			COnOffPackageReq req;
-			req.fromBuf(buf->base);
-			if (req.valid())
-			{
-				CCommandPackageAck ack;
-				ack.data = 1;
-				write_req_t *wr;
-				wr = (write_req_t*)malloc(sizeof *wr);
-				wr->buf = uv_buf_init(ack.toBuf(), ack.getSize());
-
-				if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
-				{
-					FATAL("uv_write failed");
-				}
-			}
 			break;
 		}
 		default:

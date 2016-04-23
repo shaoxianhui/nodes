@@ -255,7 +255,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CSwitchPackageReq data;
 			data.sw = (sw++)%2;
-			NodeCmdSend(&node, 2, sizeof(data.sw), (uchar*)&data.sw);
+			NodeCmdSend(&node, 1, sizeof(data.sw), (uchar*)&data.sw);
 			AfxMessageBox(str);
 		}
 	}
@@ -306,6 +306,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 	{
 		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
 		{
+			str = m_list.GetItemText(i, 0);
 			COnOffPackageReq req;
 			COnOffPackageData nodes[1];
 			char buf[1024];
@@ -319,6 +320,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 
 			write_req = (uv_write_t*)malloc(sizeof *write_req);
 			uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
+			AfxMessageBox(str);
 		}
 	}
 }
@@ -472,7 +474,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand3()
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CCommandPackageReqData data;
-			data.dispNum = 120;
+			data.dispNum = sw;
 			data.validNum = 3;
 			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);
@@ -497,7 +499,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand4()
 			CDisplayPackageReqData nodes[1];
 			//memset(nodes[0].UID, 0, 12);
 			CUtil::StringtoUID(str.GetBuffer(), (char*)nodes[0].UID);
-			nodes[0].disp.dispNum = 120;
+			nodes[0].disp.dispNum = sw;
 			nodes[0].disp.validNum = 3;
 			req.toBuf(nodes, 1, buf, &len);
 			write_buf = uv_buf_init(buf, len);
