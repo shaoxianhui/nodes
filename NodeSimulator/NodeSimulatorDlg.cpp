@@ -109,7 +109,7 @@ BOOL CNodeSimulatorDlg::OnInitDialog()
 	}
 
 	// 设置此对话框的图标。  当应用程序主窗口不是对话框时，框架将自动
-	//  执行此操作
+	// 执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 	dlg = this;
@@ -272,9 +272,9 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 void CNodeSimulatorDlg::OnBnClickedOk()
 {
 	this->UpdateData(TRUE);
-	if (hThead == NULL)
+	if (hThread == NULL)
 	{
-		hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
+		hThread = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
 		SetTimer(1, 1000, NULL);
 	}
 	else

@@ -1,11 +1,11 @@
 #pragma once
 class CCountThread
 {
-public:
+private:
 	CCountThread();
 	~CCountThread();
 private:
-	HANDLE hThead;
+	HANDLE hThread;
 	DWORD  dwThreadID;
 	int veri_count;
 public:

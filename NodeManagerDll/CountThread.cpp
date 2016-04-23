@@ -26,7 +26,7 @@ DWORD WINAPI CountThreadProc(LPVOID lpParam)
 CCountThread::CCountThread()
 {
 	veri_count = 0;
-	hThead = CreateThread(NULL, 0, CountThreadProc, NULL, 0, &dwThreadID);
+	hThread = CreateThread(NULL, 0, CountThreadProc, NULL, 0, &dwThreadID);
 }
 
 

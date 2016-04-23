@@ -47,6 +47,9 @@ public:
 	afx_msg void OnBnClickedButtonConn();
 	afx_msg void OnBnClickedButtonQuick();
 private:
-	HANDLE hThead = NULL;
+	HANDLE hThread = NULL;
 	DWORD  dwThreadID;
+public:
+	afx_msg void OnBnClickedButtonCommand3();
+	afx_msg void OnBnClickedButtonCommand4();
 };

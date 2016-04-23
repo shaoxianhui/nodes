@@ -168,6 +168,7 @@
     <ClInclude Include="HartPackageReq.h" />
     <ClInclude Include="HartPackageAckData.h" />
     <ClInclude Include="HartPackageReqData.h" />
+    <ClInclude Include="HeartCountTimer.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NodeInfo.h" />
     <ClInclude Include="NodeInfoList.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="HartPackageReq.cpp" />
     <ClCompile Include="HartPackageAckData.cpp" />
     <ClCompile Include="HartPackageReqData.cpp" />
+    <ClCompile Include="HeartCountTimer.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="NodeInfo.cpp" />
     <ClCompile Include="NodeInfoList.cpp" />

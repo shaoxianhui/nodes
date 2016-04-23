@@ -15,6 +15,8 @@
 #include "AllNodes.h"
 #include "CommandPackageAck.h"
 #include "DisplayPackageReq.h"
+#include "NodeInfoWithSocket.h"
+extern int cmdPort;
 extern void TCPDisplayNodeCmdSend(CDisplayPackageReq* req);
 extern void TCPOnOffNodeCmdSend(COnOffPackageReq* req);
 typedef struct {
@@ -108,15 +110,14 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					char buf[1024];
 					acks[i].toBuf(0, NULL, 0, buf, &buf_len);
 
-						write_req_t *wr;
-						wr = (write_req_t*)malloc(sizeof *wr);
-						wr->buf = uv_buf_init(buf, acks[i].getSize());
+					write_req_t *wr;
+					wr = (write_req_t*)malloc(sizeof *wr);
+					wr->buf = uv_buf_init(buf, acks[i].getSize());
 
-						if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
-						{
-							FATAL("uv_write failed");
-						}
-					
+					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+					{
+						FATAL("uv_write failed");
+					}
 				}
 				CNodeQueryEndPackageAck ack;
 				ack.totalNodeNum = 0;
@@ -256,9 +257,9 @@ DWORD WINAPI TcpThreadProc(LPVOID lpParam)
 {
 	uv_loop_init(&loop);
 	struct sockaddr_in addr;
-	uv_ip4_addr("0.0.0.0", TEST_PORT + 1, &addr);
+	uv_ip4_addr("0.0.0.0", cmdPort, &addr);
 	uv_tcp_init(&loop, &tcp_server);
-	uv_tcp_bind(&tcp_server, (const struct sockaddr*) &addr, 0);
+	uv_tcp_bind(&tcp_server, (const struct sockaddr*)&addr, 0);
 	uv_listen((uv_stream_t*)&tcp_server, SOMAXCONN, on_connection);
 	uv_run(&loop, UV_RUN_DEFAULT);
 	return 0;
@@ -266,7 +267,7 @@ DWORD WINAPI TcpThreadProc(LPVOID lpParam)
 
 CTcpThread::CTcpThread()
 {
-	hThead = CreateThread(NULL, 0, TcpThreadProc, NULL, 0, &dwThreadID);
+	hThread = CreateThread(NULL, 0, TcpThreadProc, NULL, 0, &dwThreadID);
 }
 
 CTcpThread::~CTcpThread()

@@ -5,7 +5,7 @@ private:
 	CUdpThread();
 	~CUdpThread();
 private:
-	HANDLE hThead;
+	HANDLE hThread;
 	DWORD  dwThreadID;
 public:
 	static CUdpThread* GetInstance()

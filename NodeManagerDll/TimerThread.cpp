@@ -10,7 +10,7 @@ static uv_loop_t loop;
 
 static void repeat_cb(uv_timer_t* handle)
 {
-	CLog::GetInstance()->funLog("Timer!");
+	CLog::GetInstance()->funLog("更新在线状态表!");
 	CAllNodes::GetInstance()->updateStatus();
 }
 
@@ -25,7 +25,7 @@ DWORD WINAPI TimerThreadProc(LPVOID lpParam)
 
 CTimerThread::CTimerThread()
 {
-	hThead = CreateThread(NULL, 0, TimerThreadProc, NULL, 0, &dwThreadID);
+	hThread = CreateThread(NULL, 0, TimerThreadProc, NULL, 0, &dwThreadID);
 }
 
 CTimerThread::~CTimerThread()

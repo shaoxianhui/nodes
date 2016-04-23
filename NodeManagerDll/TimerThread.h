@@ -1,11 +1,11 @@
 #pragma once
 class CTimerThread
 {
-public:
+private:
 	CTimerThread();
 	~CTimerThread();
 private:
-	HANDLE hThead;
+	HANDLE hThread;
 	DWORD  dwThreadID;
 public:
 	static CTimerThread* GetInstance()

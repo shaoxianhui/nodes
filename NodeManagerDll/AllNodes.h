@@ -24,8 +24,9 @@ public:
 		static CAllNodes instance;
 		return &instance;
 	}
-	void insertNode(CHartPackageReq* req, const sockaddr* addr = NULL)
+	bool insertNode(CHartPackageReq* req, const sockaddr* addr = NULL)
 	{
+		bool insert_or_update;
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
 		NODE_MAP::iterator iter = allNodes.find(uid);
 		CNodeInfoWithSocket info;
@@ -37,17 +38,20 @@ public:
 			//∏¸–¬
 			info.info.SN = iter->second.info.SN;
 			info.info.allStatus = iter->second.info.allStatus;
+			insert_or_update = false;
 		}
 		else
 		{
 			//≤Â»Î
 			info.info.SN = (uint)getCount();
 			info.info.setFail();
+			insert_or_update = true;
 		}
 		info.info.setOnline();
 		time(&info.timestamp);
 		allNodes[uid] = info;
 		allNodesKeySocket[CUtil::SockaddrToString(&info.addr)] = &allNodes[uid];
+		return insert_or_update;
 	}
 	CNodeInfoWithSocket* findNodeByUID(uchar UID[12])
 	{

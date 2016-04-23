@@ -52,13 +52,24 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 #endif // _DEBUG
 			{
 				// 插入或者更新节点信息
-				CAllNodes::GetInstance()->insertNode(&req, addr);
+				bool insert_or_update = CAllNodes::GetInstance()->insertNode(&req, addr);
 				//申请发送请求
 				uv_udp_send_t* send_req;
 				send_req = (uv_udp_send_t*)malloc(sizeof *send_req);
 				//响应包
 				CHartPackageAck ack;
 				memcpy(&ack.data, &req.data, req.data.getSize());
+				if (insert_or_update == true)
+				{
+					ack.data.useTimeAdd = 1;
+					ack.data.timeAdd = rand() % (HART_CYCLE / 100);
+				}
+				else
+				{
+					ack.data.useTimeAdd = 0;
+					ack.data.timeAdd = 0;
+				}
+
 				//初始化buf
 				uv_buf_t sndbuf;
 				sndbuf = uv_buf_init(ack.toBuf(), ack.getSize());
@@ -116,7 +127,7 @@ DWORD WINAPI UdpThreadProc(LPVOID lpParam)
 CUdpThread::CUdpThread()
 {
 	isStart = TRUE;
-	hThead = CreateThread(NULL, 0, UdpThreadProc, NULL, 0, &dwThreadID);
+	hThread = CreateThread(NULL, 0, UdpThreadProc, NULL, 0, &dwThreadID);
 }
 
 CUdpThread::~CUdpThread()

@@ -17,6 +17,7 @@
 #include "AllNodes.h"
 #include "NodeInfoList.h"
 #include "SwitchPackageReq.h"
+#include "HeartCountTimer.h"
 /////////////////////////////////////////////////////////////////////////////
 bool isStart = FALSE;
 int GPRSPort = 0;
@@ -38,6 +39,7 @@ NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsi
 	CTcpThread::GetInstance();
 	CTimerThread::GetInstance();
 	CCountThread::GetInstance();
+	CHeartCountTimer::GetInstance();
 	//for (int i = 0; i < 71; i++)
 	//{
 	//	CHartPackageReq req;

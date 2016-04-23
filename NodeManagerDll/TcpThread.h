@@ -5,7 +5,7 @@ private:
 	CTcpThread();
 	~CTcpThread();
 private:
-	HANDLE hThead;
+	HANDLE hThread;
 	DWORD  dwThreadID;
 public:
 	static CTcpThread* GetInstance()

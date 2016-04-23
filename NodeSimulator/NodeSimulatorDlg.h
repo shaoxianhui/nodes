@@ -35,7 +35,7 @@ protected:
 public:
 	afx_msg void OnBnClickedOk();
 private:
-	HANDLE hThead = NULL;
+	HANDLE hThread = NULL;
 	DWORD  dwThreadID;
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

@@ -90,6 +90,8 @@ BEGIN_MESSAGE_MAP(CNodeManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_COMMAND2, &CNodeManagerDlg::OnBnClickedButtonCommand2)
 	ON_BN_CLICKED(IDC_BUTTON_CONN, &CNodeManagerDlg::OnBnClickedButtonConn)
 	ON_BN_CLICKED(IDC_BUTTON_QUICK, &CNodeManagerDlg::OnBnClickedButtonQuick)
+	ON_BN_CLICKED(IDC_BUTTON_COMMAND3, &CNodeManagerDlg::OnBnClickedButtonCommand3)
+	ON_BN_CLICKED(IDC_BUTTON_COMMAND4, &CNodeManagerDlg::OnBnClickedButtonCommand4)
 END_MESSAGE_MAP()
 
 // CNodeManagerDlg 消息处理程序
@@ -251,12 +253,9 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			str = m_list.GetItemText(i, 0);
 			CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
-			//CSwitchPackageReq data;
-			//data.sw = (sw++)%2;
-			CCommandPackageReqData data;
-			data.dispNum = 120;
-			data.validNum = 3;
-			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
+			CSwitchPackageReq data;
+			data.sw = (sw++)%2;
+			NodeCmdSend(&node, 2, sizeof(data.sw), (uchar*)&data.sw);
 			AfxMessageBox(str);
 		}
 	}
@@ -302,20 +301,26 @@ void CNodeManagerDlg::OnBnClickedButtonInfo2()
 
 void CNodeManagerDlg::OnBnClickedButtonCommand2()
 {
-	//COnOffPackageReq req;
-	CDisplayPackageReq req;
-	int len = 0;
-	uv_write_t* write_req;
-	uv_buf_t write_buf;
-	char buf[1024];
-	CDisplayPackageReqData nodes[1];
-	memset(nodes[0].UID, 0, 12);
-	nodes[0].disp.dispNum = 1;
-	req.toBuf(nodes, 1, buf, &len);
-	write_buf = uv_buf_init(buf, len);
+	CString str;
+	for (int i = 0; i < m_list.GetItemCount(); i++)
+	{
+		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
+		{
+			COnOffPackageReq req;
+			COnOffPackageData nodes[1];
+			char buf[1024];
+			CUtil::StringtoUID(str.GetBuffer(), (char*)nodes[0].UID);
+			nodes[0].sw = (sw++) % 2;
+			int len = 0;
+			uv_write_t* write_req;
+			uv_buf_t write_buf;
+			req.toBuf(nodes, 1, buf, &len);
+			write_buf = uv_buf_init(buf, len);
 
-	write_req = (uv_write_t*)malloc(sizeof *write_req);
-	uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
+			write_req = (uv_write_t*)malloc(sizeof *write_req);
+			uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
+		}
+	}
 }
 
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
@@ -429,7 +434,7 @@ static void connect_cb(uv_connect_t* conn_req, int status)
 DWORD WINAPI ThreadProc(LPVOID lpParam)
 {
 	struct sockaddr_in addr;
-	uv_ip4_addr("118.26.131.14", TEST_PORT + 1, &addr);
+	uv_ip4_addr("127.0.0.1", TEST_PORT + 1, &addr);
 
 	uv_tcp_init(uv_default_loop(), &tcp_handle);
 	uv_tcp_connect(&connect_req, &tcp_handle, (const struct sockaddr*) &addr, connect_cb);
@@ -440,7 +445,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 }
 void CNodeManagerDlg::OnBnClickedButtonConn()
 {
-	hThead = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
+	hThread = CreateThread(NULL, 0, ThreadProc, this, 0, &dwThreadID);
 }
 
 void CNodeManagerDlg::OnBnClickedButtonQuick()
@@ -453,4 +458,53 @@ void CNodeManagerDlg::OnBnClickedButtonQuick()
 
 	write_req = (uv_write_t*)malloc(sizeof *write_req);
 	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonCommand3()
+{
+	CString str;
+	for (int i = 0; i < m_list.GetItemCount(); i++)
+	{
+		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
+		{
+			str = m_list.GetItemText(i, 0);
+			CNodeInfo node;
+			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
+			CCommandPackageReqData data;
+			data.dispNum = 120;
+			data.validNum = 3;
+			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
+			AfxMessageBox(str);
+		}
+	}
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonCommand4()
+{
+	CString str;
+	for (int i = 0; i < m_list.GetItemCount(); i++)
+	{
+		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
+		{
+			str = m_list.GetItemText(i, 0);
+			CDisplayPackageReq req;
+			int len = 0;
+			uv_write_t* write_req;
+			uv_buf_t write_buf;
+			char buf[1024];
+			CDisplayPackageReqData nodes[1];
+			//memset(nodes[0].UID, 0, 12);
+			CUtil::StringtoUID(str.GetBuffer(), (char*)nodes[0].UID);
+			nodes[0].disp.dispNum = 120;
+			nodes[0].disp.validNum = 3;
+			req.toBuf(nodes, 1, buf, &len);
+			write_buf = uv_buf_init(buf, len);
+
+			write_req = (uv_write_t*)malloc(sizeof *write_req);
+			uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
+			AfxMessageBox(str);
+		}
+	}
 }
