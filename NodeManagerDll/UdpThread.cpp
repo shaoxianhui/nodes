@@ -149,8 +149,9 @@ void CUdpThread::Start()
 	uv_udp_recv_start(&udp_server, alloc_cb, sv_recv_cb);
 }
 
-NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort dataLen, uchar *ptrData)
+NODEMANAGERDLL_API void NodeCmdSend(C_CNodeInfo* c_nodeInfo, uchar type, ushort dataLen, uchar *ptrData)
 {
+	CNodeInfo* nodeInfo = (CNodeInfo*)c_nodeInfo;
 	switch (type)
 	{
 	case 0x01:

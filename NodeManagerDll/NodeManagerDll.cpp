@@ -73,9 +73,9 @@ NODEMANAGERDLL_API void NodeNumRequest(uint *nodeNum)
 {
 	*nodeNum = (uint)CAllNodes::GetInstance()->getCount();
 }
-NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList)
+NODEMANAGERDLL_API void NodeInfoRequest(C_CNodeInfoList *c_ptrNodeInfoList)
 {
-	CAllNodes::GetInstance()->fill(ptrNodeInfoList);
+	CAllNodes::GetInstance()->fill((CNodeInfoList*)c_ptrNodeInfoList);
 }
 NODEMANAGERDLL_API string getKey()
 {

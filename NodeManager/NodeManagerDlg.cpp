@@ -209,9 +209,9 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 	NodeNumRequest(&num);
 	if (num > 0)
 	{
-		CNodeInfoList list;
+		C_CNodeInfoList list;
 		list.nodeNum = num;
-		list.nodeInfoList = new CNodeInfo[num];
+		list.nodeInfoList = new C_CNodeInfo[num];
 		NodeInfoRequest(&list);
 		if (list.nodeNum > 0)
 		{
@@ -224,10 +224,10 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 				memset(temp, 0x00, 12);
 				sprintf_s(temp, "%d", list.nodeInfoList[i].SN);
 				m_list.SetItemText(item, 2, temp);
-				sprintf_s(temp, "%d", list.nodeInfoList[i].isOnline());
-				m_list.SetItemText(item, 3, temp);
-				sprintf_s(temp, "%d", list.nodeInfoList[i].isSuccess());
-				m_list.SetItemText(item, 4, temp);
+				//sprintf_s(temp, "%d", list.nodeInfoList[i].isOnline());
+				//m_list.SetItemText(item, 3, temp);
+				//sprintf_s(temp, "%d", list.nodeInfoList[i].isSuccess());
+				//m_list.SetItemText(item, 4, temp);
 			}
 		}
 	}
@@ -251,7 +251,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
 		{
 			str = m_list.GetItemText(i, 0);
-			CNodeInfo node;
+			C_CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CSwitchPackageReq data;
 			data.sw = (sw++)%2;
@@ -469,7 +469,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand3()
 		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
 		{
 			str = m_list.GetItemText(i, 0);
-			CNodeInfo node;
+			C_CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CCommandPackageReqData data;
 			data.dispNum = 120;
