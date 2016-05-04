@@ -29,7 +29,7 @@
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
+CListCtrl* g_list;
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 class CAboutDlg : public CDialogEx
 {
@@ -132,7 +132,7 @@ BOOL CNodeManagerDlg::OnInitDialog()
 	m_list.InsertColumn(2, _T("SN"), LVCFMT_CENTER, rect.Width() / 44 * 4, 2);
 	m_list.InsertColumn(3, _T("在线"), LVCFMT_CENTER, rect.Width() / 44 * 4, 3);
 	m_list.InsertColumn(4, _T("通信"), LVCFMT_CENTER, rect.Width() / 44 * 4, 4);
-
+	g_list = &m_list;
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -255,7 +255,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CSwitchPackageReq data;
 			data.sw = (sw++)%2;
-			NodeCmdSend(&node, 2, sizeof(data.sw), (uchar*)&data.sw);
+			NodeCmdSend(&node, 1, sizeof(data.sw), (uchar*)&data.sw);
 			AfxMessageBox(str);
 		}
 	}
@@ -270,16 +270,14 @@ static void write_cb(uv_write_t* req, int status) {
 
 void CNodeManagerDlg::OnBnClickedButtonVeri()
 {
-	string s = getKey();
-	MessageBox(s.c_str());
-	/*CVerificationPackageReq req;
+	CVerificationPackageReq req;
 	uv_write_t* write_req;
 	uv_buf_t buf;
 
 	buf = uv_buf_init(req.toBuf(), req.getSize());
 	
 	write_req = (uv_write_t*)malloc(sizeof *write_req);
-	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);*/
+	uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 }
 
 void CNodeManagerDlg::OnBnClickedButtonNum2()
@@ -306,6 +304,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 	{
 		if (m_list.GetItemState(i, LVIS_SELECTED) == LVIS_SELECTED)
 		{
+			str = m_list.GetItemText(i, 0);
 			COnOffPackageReq req;
 			COnOffPackageData nodes[1];
 			char buf[1024];
@@ -319,6 +318,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 
 			write_req = (uv_write_t*)malloc(sizeof *write_req);
 			uv_write(write_req, (uv_stream_t*)&tcp_handle, &write_buf, 1, write_cb);
+			AfxMessageBox(str);
 		}
 	}
 }
@@ -351,7 +351,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 		}
 		case 0xF2:
 		{
-			if (((uchar)buf->base[5]) == 0xFF && ((uchar)buf->base[6]) == 0xFF)
+			if (((uchar)buf->base[offset + 5]) == 0xFF && ((uchar)buf->base[offset + 6]) == 0xFF)
 			{
 				CNodeQueryEndPackageAck ack;
 				ack.fromBuf(buf->base + offset);
@@ -369,6 +369,25 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 				ack.fromBuf(buf->base + offset);
 				if (ack.valid())
 				{
+					uint num = ack.getCount();
+					g_list->DeleteAllItems();
+					if (num > 0)
+					{
+						for (int i = 0; i < num; i++)
+						{
+							int item = g_list->InsertItem(g_list->GetItemCount(), CUtil::UIDtoString((char*)ack.data[i].UID).c_str());
+							char temp[12] = { 0x00 };
+							memcpy(temp, ack.data[i].phoneNum, 11);
+							g_list->SetItemText(item, 1, temp);
+							memset(temp, 0x00, 12);
+							sprintf_s(temp, "%d", ack.data[i].SN);
+							g_list->SetItemText(item, 2, temp);
+							sprintf_s(temp, "%d", ack.data[i].isOnline());
+							g_list->SetItemText(item, 3, temp);
+							sprintf_s(temp, "%d", ack.data[i].isSuccess());
+							g_list->SetItemText(item, 4, temp);
+						}
+					}
 					CString str;
 					str.Format("%d", ack.getSize());
 					AfxMessageBox(str);
@@ -379,7 +398,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 		}
 		case 0xF3:
 		{
-			if (((uchar)buf->base[5]) == 0xFF && ((uchar)buf->base[6]) == 0xFF)
+			if (((uchar)buf->base[offset + 5]) == 0xFF && ((uchar)buf->base[offset + 6]) == 0xFF)
 			{
 				CNodeQuickQueryEndPackageAck ack;
 				ack.fromBuf(buf->base + offset);
@@ -472,7 +491,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand3()
 			C_CNodeInfo node;
 			CUtil::StringtoUID(str.GetBuffer(), (char*)node.UID);
 			CCommandPackageReqData data;
-			data.dispNum = 120;
+			data.dispNum = sw;
 			data.validNum = 3;
 			NodeCmdSend(&node, 2, sizeof(data), (uchar*)&data);
 			AfxMessageBox(str);
@@ -497,7 +516,7 @@ void CNodeManagerDlg::OnBnClickedButtonCommand4()
 			CDisplayPackageReqData nodes[1];
 			//memset(nodes[0].UID, 0, 12);
 			CUtil::StringtoUID(str.GetBuffer(), (char*)nodes[0].UID);
-			nodes[0].disp.dispNum = 120;
+			nodes[0].disp.dispNum = sw;
 			nodes[0].disp.validNum = 3;
 			req.toBuf(nodes, 1, buf, &len);
 			write_buf = uv_buf_init(buf, len);

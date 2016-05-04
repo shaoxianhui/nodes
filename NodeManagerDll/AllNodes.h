@@ -8,6 +8,7 @@
 #include <time.h>
 #include "NodeQueryPackageAck.h"
 #include "NodeQuickQueryPackageAck.h"
+#include "Log.h"
 using namespace std;
 class CAllNodes
 {
@@ -28,6 +29,7 @@ public:
 	{
 		bool insert_or_update;
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
+		CLog::GetInstance()->nodeLog("ÐÄÌø£º" + uid);
 		NODE_MAP::iterator iter = allNodes.find(uid);
 		CNodeInfoWithSocket info;
 		memcpy(info.info.UID, req->data.UID, 12);

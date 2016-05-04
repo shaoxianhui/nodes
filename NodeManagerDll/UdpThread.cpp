@@ -34,7 +34,7 @@ static void sv_send_cb(uv_udp_send_t* req, int status)
 
 static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, const struct sockaddr* addr, unsigned flags)
 {
-	if (nread <= 0)
+	if (nread <= 0 || isStart == FALSE)
 		return;
 	CLog::GetInstance()->funLog(CUtil::SockaddrToString(addr));
 	switch ((uchar)rcvbuf->base[2])
@@ -139,14 +139,12 @@ void CUdpThread::Stop()
 {
 	CLog::GetInstance()->funLog("¹Ø±ÕUDP¼àÌý£¡");
 	isStart = FALSE;
-	uv_udp_recv_stop(&udp_server);
 }
 
 void CUdpThread::Start()
 {
 	CLog::GetInstance()->funLog("¿ªÆôUDP¼àÌý£¡");
 	isStart = TRUE;
-	uv_udp_recv_start(&udp_server, alloc_cb, sv_recv_cb);
 }
 
 NODEMANAGERDLL_API void NodeCmdSend(C_CNodeInfo* c_nodeInfo, uchar type, ushort dataLen, uchar *ptrData)
