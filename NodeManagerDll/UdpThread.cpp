@@ -28,7 +28,6 @@ static void alloc_cb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 
 static void sv_send_cb(uv_udp_send_t* req, int status) 
 {
-	CLog::GetInstance()->funLog("发送数据回调！");
 	free(req);
 }
 
@@ -36,7 +35,6 @@ static void sv_recv_cb(uv_udp_t* handle, ssize_t nread, const uv_buf_t* rcvbuf, 
 {
 	if (nread <= 0 || isStart == FALSE)
 		return;
-	CLog::GetInstance()->funLog(CUtil::SockaddrToString(addr));
 	switch ((uchar)rcvbuf->base[2])
 	{
 		//心跳
@@ -137,13 +135,13 @@ CUdpThread::~CUdpThread()
 
 void CUdpThread::Stop()
 {
-	CLog::GetInstance()->funLog("关闭UDP监听！");
+	CLog::GetInstance()->funLog("close UDP");
 	isStart = FALSE;
 }
 
 void CUdpThread::Start()
 {
-	CLog::GetInstance()->funLog("开启UDP监听！");
+	CLog::GetInstance()->funLog("start UDP");
 	isStart = TRUE;
 }
 

@@ -36,7 +36,7 @@
             // 
             // call
             // 
-            this.call.Location = new System.Drawing.Point(45, 77);
+            this.call.Location = new System.Drawing.Point(96, 89);
             this.call.Name = "call";
             this.call.Size = new System.Drawing.Size(75, 23);
             this.call.TabIndex = 0;
@@ -46,7 +46,7 @@
             // 
             // initdll
             // 
-            this.initdll.Location = new System.Drawing.Point(45, 33);
+            this.initdll.Location = new System.Drawing.Point(96, 45);
             this.initdll.Name = "initdll";
             this.initdll.Size = new System.Drawing.Size(75, 23);
             this.initdll.TabIndex = 1;
@@ -56,7 +56,7 @@
             // 
             // nodeinfo
             // 
-            this.nodeinfo.Location = new System.Drawing.Point(45, 127);
+            this.nodeinfo.Location = new System.Drawing.Point(96, 139);
             this.nodeinfo.Name = "nodeinfo";
             this.nodeinfo.Size = new System.Drawing.Size(75, 23);
             this.nodeinfo.TabIndex = 2;
@@ -66,7 +66,7 @@
             // 
             // sendcmd
             // 
-            this.sendcmd.Location = new System.Drawing.Point(45, 173);
+            this.sendcmd.Location = new System.Drawing.Point(96, 185);
             this.sendcmd.Name = "sendcmd";
             this.sendcmd.Size = new System.Drawing.Size(75, 23);
             this.sendcmd.TabIndex = 3;

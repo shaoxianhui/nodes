@@ -10,7 +10,6 @@ static uv_loop_t loop;
 
 static void repeat_cb(uv_timer_t* handle)
 {
-	CLog::GetInstance()->funLog("更新在线状态表!");
 	CAllNodes::GetInstance()->updateStatus();
 }
 

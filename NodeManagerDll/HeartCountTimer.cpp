@@ -9,7 +9,6 @@ static uv_loop_t loop;
 
 static void repeat_cb(uv_timer_t* handle)
 {
-	CLog::GetInstance()->funLog("ÐÄÌø°üÇåÁã!");
 	CHeartCountTimer::GetInstance()->zero();
 }
 

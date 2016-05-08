@@ -20,6 +20,10 @@ extern "C" NODEMANAGERDLL_API void StartGPRS(void);
 
 extern "C" NODEMANAGERDLL_API void StopGPRS(void);
 
+extern "C" NODEMANAGERDLL_API void StartLog(void);
+
+extern "C" NODEMANAGERDLL_API void StopLog(void);
+
 extern "C" NODEMANAGERDLL_API void NodeNumRequest(unsigned int *nodeNum);
 
 extern "C" NODEMANAGERDLL_API void NodeInfoRequest(CNodeInfoList *ptrNodeInfoList);

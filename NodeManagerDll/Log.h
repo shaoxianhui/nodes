@@ -23,14 +23,25 @@ public:
 private:
 	Logger funlog;
 	Logger nodelog;
+	bool printLog = true;
 public:
 	void funLog(string message)
 	{
-		LOG4CPLUS_DEBUG(funlog, message);
+		if(printLog == true)
+			LOG4CPLUS_DEBUG(funlog, message);
 	}
 	void nodeLog(string message)
 	{
-		LOG4CPLUS_DEBUG(nodelog, message);
+		if (printLog == true)
+			LOG4CPLUS_DEBUG(nodelog, message);
+	}
+	void Start()
+	{
+		printLog = true;
+	}
+	void Stop()
+	{
+		printLog = false;
 	}
 };
 

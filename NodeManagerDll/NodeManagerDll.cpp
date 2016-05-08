@@ -23,6 +23,7 @@ bool isStart = FALSE;
 int GPRSPort = 0;
 int cmdPort = 0;
 int maxNode = 0;
+bool printLog = TRUE;
 unsigned char sec[128];
 /////////////////////////////////////////////////////////////////////////////
 using namespace std;
@@ -30,7 +31,9 @@ using namespace std;
 
 NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsigned char _sec[128])
 {
-	CLog::GetInstance()->funLog("³õÊ¼»¯GPRS£¡");
+	char log[128] = { 0x00 };
+	sprintf(log, "InitGPRS : gprsport = %d, cmdport = %d, maxnode = %d, status = success", _GPRSPort, _cmdPort, _maxNode);
+	CLog::GetInstance()->funLog(log);
 	GPRSPort = _GPRSPort;
 	cmdPort = _cmdPort;
 	maxNode = _maxNode;
@@ -61,6 +64,28 @@ NODEMANAGERDLL_API void StopGPRS(void)
 	else
 	{
 		CUdpThread::GetInstance()->Stop();
+	}
+}
+NODEMANAGERDLL_API void StartLog(void)
+{
+	if (printLog == TRUE)
+	{
+		return;
+	}
+	else
+	{
+		CLog::GetInstance()->Start();
+	}
+}
+NODEMANAGERDLL_API void StopLog(void)
+{
+	if (printLog == FALSE)
+	{
+		return;
+	}
+	else
+	{
+		CLog::GetInstance()->Stop();
 	}
 }
 NODEMANAGERDLL_API void NodeNumRequest(uint *nodeNum)

@@ -29,7 +29,6 @@ public:
 	{
 		bool insert_or_update;
 		string uid = CUtil::UIDtoString((char*)req->data.UID);
-		CLog::GetInstance()->nodeLog("ĞÄÌø£º" + uid);
 		NODE_MAP::iterator iter = allNodes.find(uid);
 		CNodeInfoWithSocket info;
 		memcpy(info.info.UID, req->data.UID, 12);
@@ -41,6 +40,10 @@ public:
 			info.info.SN = iter->second.info.SN;
 			info.info.allStatus = iter->second.info.allStatus;
 			insert_or_update = false;
+			if (!info.info.isOnline())
+			{
+				CLog::GetInstance()->nodeLog("online node : UID = " + uid);
+			}
 		}
 		else
 		{
@@ -48,6 +51,7 @@ public:
 			info.info.SN = (uint)getCount();
 			info.info.setFail();
 			insert_or_update = true;
+			CLog::GetInstance()->nodeLog("new node : UID = " + uid);
 		}
 		info.info.setOnline();
 		time(&info.timestamp);
@@ -184,6 +188,7 @@ public:
 			if (now - iter->second.timestamp > HART_CYCLE * 2 / 1000)
 			{
 				iter->second.info.setOffline();
+				CLog::GetInstance()->nodeLog("offline node : UID = " + iter->first);
 			}
 		}
 	}
