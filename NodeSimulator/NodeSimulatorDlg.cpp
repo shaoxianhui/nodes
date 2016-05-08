@@ -254,7 +254,7 @@ DWORD WINAPI ThreadProc(LPVOID lpParam)
 #ifdef _DEBUG
 		uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
 #else
-		uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+		uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
 #endif // _DEBUG
 		uv_udp_init(uv_default_loop(), &client);	
 		buf = uv_buf_init((char*)&req, req.getSize());
@@ -297,7 +297,7 @@ void CNodeSimulatorDlg::SendHartPackage()
 #ifdef _DEBUG
 	uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
 #else
-	uv_ip4_addr("118.26.131.14", TEST_PORT, &addr);
+	uv_ip4_addr("127.0.0.1", TEST_PORT, &addr);
 #endif // _DEBUG
 	CHartPackageReq req;
 	uv_buf_t buf;
