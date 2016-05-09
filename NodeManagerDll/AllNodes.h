@@ -10,6 +10,7 @@
 #include "NodeQuickQueryPackageAck.h"
 #include "Log.h"
 using namespace std;
+extern void NodeSendBuf(CNodeInfoWithSocket* info);
 class CAllNodes
 {
 private:
@@ -39,10 +40,16 @@ public:
 			//¸üÐÂ
 			info.info.SN = iter->second.info.SN;
 			info.info.allStatus = iter->second.info.allStatus;
+			info.cmdlen = iter->second.cmdlen;
+			memcpy(info.cmdbuf, iter->second.cmdbuf, 1024);
 			insert_or_update = false;
 			if (!info.info.isOnline())
 			{
 				CLog::GetInstance()->nodeLog("online node : UID = " + uid);
+			}
+			if (!info.info.isSuccess() && info.cmdlen > 0)
+			{
+				NodeSendBuf(&info);
 			}
 		}
 		else
