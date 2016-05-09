@@ -73,7 +73,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 		case 0x01:
 		{
 			uchar r = 0;
-			if (CCountThread::GetInstance()->up())
+			if (CVeriCountThread::GetInstance()->up())
 			{
 				r = 1;
 			}

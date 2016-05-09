@@ -160,7 +160,7 @@
     <ClInclude Include="CommandPackageReq.h" />
     <ClInclude Include="CommandPackageReqData.h" />
     <ClInclude Include="common.h" />
-    <ClInclude Include="CountThread.h" />
+    <ClInclude Include="VeriCountThread.h" />
     <ClInclude Include="DisplayPackageReq.h" />
     <ClInclude Include="DisplayPackageReqData.h" />
     <ClInclude Include="ErrorPackageAck.h" />
@@ -198,7 +198,7 @@
     <ClCompile Include="CommandPackageAck.cpp" />
     <ClCompile Include="CommandPackageReq.cpp" />
     <ClCompile Include="CommandPackageReqData.cpp" />
-    <ClCompile Include="CountThread.cpp" />
+    <ClCompile Include="VeriCountThread.cpp" />
     <ClCompile Include="DisplayPackageReq.cpp" />
     <ClCompile Include="DisplayPackageReqData.cpp" />
     <ClCompile Include="dllmain.cpp">

@@ -1,17 +1,17 @@
 #pragma once
-class CCountThread
+class CVeriCountThread
 {
 private:
-	CCountThread();
-	~CCountThread();
+	CVeriCountThread();
+	~CVeriCountThread();
 private:
 	HANDLE hThread;
 	DWORD  dwThreadID;
 	int veri_count;
 public:
-	static CCountThread* GetInstance()
+	static CVeriCountThread* GetInstance()
 	{
-		static CCountThread instance;
+		static CVeriCountThread instance;
 		return &instance;
 	}
 	bool up()

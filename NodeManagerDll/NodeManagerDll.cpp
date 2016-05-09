@@ -41,7 +41,7 @@ NODEMANAGERDLL_API void InitGPRS(int _GPRSPort, int _cmdPort, int _maxNode, unsi
 	CUdpThread::GetInstance();
 	CTcpThread::GetInstance();
 	CTimerThread::GetInstance();
-	CCountThread::GetInstance();
+	CVeriCountThread::GetInstance();
 	CHeartCountTimer::GetInstance();
 }
 NODEMANAGERDLL_API void StartGPRS(void)

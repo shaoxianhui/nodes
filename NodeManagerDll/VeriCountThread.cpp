@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "CountThread.h"
+#include "VeriCountThread.h"
 #include "uv.h"
 #include "task.h"
 #include "AllNodes.h"
@@ -10,7 +10,7 @@ static uv_loop_t loop;
 
 static void repeat_cb(uv_timer_t* handle)
 {
-	CCountThread::GetInstance()->zero();
+	CVeriCountThread::GetInstance()->zero();
 }
 
 DWORD WINAPI CountThreadProc(LPVOID lpParam)
@@ -22,13 +22,13 @@ DWORD WINAPI CountThreadProc(LPVOID lpParam)
 	return 0;
 }
 
-CCountThread::CCountThread()
+CVeriCountThread::CVeriCountThread()
 {
 	veri_count = 0;
 	hThread = CreateThread(NULL, 0, CountThreadProc, NULL, 0, &dwThreadID);
 }
 
 
-CCountThread::~CCountThread()
+CVeriCountThread::~CVeriCountThread()
 {
 }
