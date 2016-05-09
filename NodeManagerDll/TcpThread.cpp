@@ -5,7 +5,7 @@
 #include "task.h"
 #include "VerificationPackageReq.h"
 #include "VerificationPackageAck.h"
-#include "CountThread.h"
+#include "VeriCountThread.h"
 #include "NodeQueryPackageReq.h"
 #include "NodeQueryPackageAck.h"
 #include "NodeQueryEndPackageAck.h"

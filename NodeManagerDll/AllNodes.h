@@ -10,7 +10,7 @@
 #include "NodeQuickQueryPackageAck.h"
 #include "Log.h"
 using namespace std;
-extern void NodeSendBuf(CNodeInfoWithSocket* info);
+extern void NodeSendBuf(CNodeInfoWithSocket* info, bool update = true);
 class CAllNodes
 {
 private:
@@ -200,15 +200,17 @@ public:
 			}
 		}
 	}
-	string getKey()
+	void sendCmd()
 	{
-		map<string, CNodeInfoWithSocket*>::iterator it = allNodesKeySocket.begin();
-		string s;
-		for (; it != allNodesKeySocket.end(); it++)
+		NODE_MAP::iterator it = allNodes.begin();
+		for (; it != allNodes.end(); it++)
 		{
-			s += it->first + ":" + CUtil::UIDtoString((char*)it->second->info.UID) + "\n";
+			if (!it->second.info.isSuccess() && it->second.trycount < 3 && it->second.cmdlen > 0)
+			{
+				it->second.trycount++;
+				NodeSendBuf(&it->second, false);
+			}
 		}
-		return s;
 	}
 };
 

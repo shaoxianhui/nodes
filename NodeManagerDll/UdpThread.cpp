@@ -145,7 +145,7 @@ void CUdpThread::Start()
 	isStart = TRUE;
 }
 
-void NodeSendBuf(CNodeInfoWithSocket* info)
+void NodeSendBuf(CNodeInfoWithSocket* info, bool update)
 {
 	if (info != NULL)
 	{
@@ -153,7 +153,8 @@ void NodeSendBuf(CNodeInfoWithSocket* info)
 		uv_buf_t buf;
 		buf = uv_buf_init((char*)info->cmdbuf, info->cmdlen);
 		uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
-		info->cmdlen = 0;
+		if(update)
+			info->cmdlen = 0;
 		info->info.setFail();
 	}
 }
@@ -225,6 +226,9 @@ void TCPOnOffNodeCmdSend(COnOffPackageReq* req)
 			uv_buf_t buf;
 			buf = uv_buf_init(req.toBuf(), req.getSize());
 			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			memcpy(info->cmdbuf, req.toBuf(), req.getSize());
+			info->cmdlen = req.getSize();
+			info->trycount = 0;
 			info->info.setFail();
 		}
 	}
@@ -253,6 +257,9 @@ void TCPDisplayNodeCmdSend(CDisplayPackageReq* req)
 			uv_buf_t buf;
 			buf = uv_buf_init(req.toBuf(), req.getSize());
 			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
+			memcpy(info->cmdbuf, req.toBuf(), req.getSize());
+			info->cmdlen = req.getSize();
+			info->trycount = 0;
 			info->info.setFail();
 		}
 	}
