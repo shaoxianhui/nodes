@@ -11,6 +11,7 @@ public:
 	sockaddr  addr;
 	char cmdbuf[1024] = { 0x00 };
 	int cmdlen = 0;
+	int trycount = 0;
 	time_t    timestamp;
 };
 

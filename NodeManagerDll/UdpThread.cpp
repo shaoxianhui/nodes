@@ -175,6 +175,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 			memcpy(info->cmdbuf, req.toBuf(), req.getSize());
 			info->cmdlen = req.getSize();
+			info->trycount = 0;
 			info->info.setFail();
 		}
 		break;
@@ -192,6 +193,7 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 			uv_udp_send(send_req, &udp_server, &buf, 1, (const struct sockaddr*) &info->addr, sv_send_cb);
 			memcpy(info->cmdbuf, req.toBuf(), req.getSize());
 			info->cmdlen = req.getSize();
+			info->trycount = 0;
 			info->info.setFail();
 		}
 

@@ -41,6 +41,7 @@ public:
 			info.info.SN = iter->second.info.SN;
 			info.info.allStatus = iter->second.info.allStatus;
 			info.cmdlen = iter->second.cmdlen;
+			info.trycount = iter->second.trycount;
 			memcpy(info.cmdbuf, iter->second.cmdbuf, 1024);
 			insert_or_update = false;
 			if (!info.info.isOnline())
