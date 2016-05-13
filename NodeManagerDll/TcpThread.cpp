@@ -25,9 +25,12 @@ typedef struct {
 	uv_write_t req;
 	uv_buf_t buf;
 } write_req_t;
-
+static uv_stream_t* client[100];
+static int client_count = 0;
 static uv_tcp_t tcp_server;
 static uv_loop_t loop;
+static uv_timer_t repeat;
+static map<string, vector<CTcpTransaction>> allTcpTransactions;
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
 	buf->base = (char*)malloc(suggested_size);
@@ -115,7 +118,13 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					write_req_t *wr;
 					wr = (write_req_t*)malloc(sizeof *wr);
 					wr->buf = uv_buf_init(buf, acks[i].getSize());
-
+					vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)handle->data;
+					CTcpTransaction t;
+					t.type = 0x12;
+					t.numFrame = acks[i].numFrame;
+					memcpy(t.buffer, buf, acks[i].getSize());
+					t.len = acks[i].getSize();
+					ts->push_back(t);
 					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
 					{
 						FATAL("uv_write failed");
@@ -144,19 +153,28 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 				int len = 4;
 				int count = 0;
 				count = CAllNodes::GetInstance()->getNodeQucikQueryPackageAck(acks, &len);
-				for (int i = 0; i < len; i++)
+				if (count > 0)
 				{
-					int buf_len;
-					char buf[1024];
-					acks[i].toBuf(0, NULL, 0, buf, &buf_len);
-
-					write_req_t *wr;
-					wr = (write_req_t*)malloc(sizeof *wr);
-					wr->buf = uv_buf_init(buf, acks[i].getSize());
-
-					if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+					for (int i = 0; i < len; i++)
 					{
-						FATAL("uv_write failed");
+						int buf_len;
+						char buf[1024];
+						acks[i].toBuf(0, NULL, 0, buf, &buf_len);
+
+						write_req_t *wr;
+						wr = (write_req_t*)malloc(sizeof *wr);
+						wr->buf = uv_buf_init(buf, acks[i].getSize());
+						vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)handle->data;
+						CTcpTransaction t;
+						t.type = 0x13;
+						t.numFrame = acks[i].numFrame;
+						memcpy(t.buffer, buf, acks[i].getSize());
+						t.len = acks[i].getSize();
+						ts->push_back(t);
+						if (uv_write(&wr->req, handle, &wr->buf, 1, after_write))
+						{
+							FATAL("uv_write failed");
+						}
 					}
 				}
 				CNodeQuickQueryEndPackageAck ack;
@@ -227,7 +245,14 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			req.fromBuf(buf->base);
 			if (req.valid())
 			{
-				
+				vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)handle->data;
+				vector<CTcpTransaction>::iterator it;
+				for (it = ts->begin();it != ts->end();it++) {
+					if (it->type == 0x12)
+					{
+						it->count = 10;
+					}
+				}
 			}
 			break;
 		}
@@ -237,7 +262,14 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			req.fromBuf(buf->base);
 			if (req.valid())
 			{
-
+				vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)handle->data;
+				vector<CTcpTransaction>::iterator it;
+				for (it = ts->begin();it != ts->end();it++) {
+					if (it->type == 0x13)
+					{
+						it->count = 10;
+					}
+				}
 			}
 			break;
 		}
@@ -253,11 +285,40 @@ static void on_connection(uv_stream_t* server, int status)
 	uv_stream_t* stream;
 	stream = (uv_stream_t*)malloc(sizeof(uv_tcp_t));
 	uv_tcp_init(&loop, (uv_tcp_t*)stream);
-
-	stream->data = server;
-
+	client[client_count++] = stream;
+	stream->data = new vector<CTcpTransaction>();
 	uv_accept(server, stream);
 	uv_read_start(stream, echo_alloc, after_read);
+}
+
+static void repeat_cb(uv_timer_t* handle)
+{
+	for (int i = 0; i < client_count; i++)
+	{
+		vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)client[i]->data;
+		vector<CTcpTransaction>::iterator it;
+		for (it = ts->begin();it != ts->end();) 
+		{
+			if (it->count < 3)
+			{
+				write_req_t *wr;
+				wr = (write_req_t*)malloc(sizeof *wr);
+				wr->buf = uv_buf_init(it->buffer, it->len);
+
+				if (uv_write(&wr->req, client[i], &wr->buf, 1, after_write))
+				{
+					FATAL("uv_write failed");
+				}
+				it->count++;
+				it++;
+			}
+			else
+			{
+				it = ts->erase(it);
+			}
+		}
+
+	}
 }
 
 DWORD WINAPI TcpThreadProc(LPVOID lpParam)
@@ -268,6 +329,9 @@ DWORD WINAPI TcpThreadProc(LPVOID lpParam)
 	uv_tcp_init(&loop, &tcp_server);
 	uv_tcp_bind(&tcp_server, (const struct sockaddr*)&addr, 0);
 	uv_listen((uv_stream_t*)&tcp_server, SOMAXCONN, on_connection);
+
+	uv_timer_init(&loop, &repeat);
+	uv_timer_start(&repeat, repeat_cb, 5000, 5000);
 	uv_run(&loop, UV_RUN_DEFAULT);
 	return 0;
 }

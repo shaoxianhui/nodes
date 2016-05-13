@@ -390,9 +390,9 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 							g_list->SetItemText(item, 4, temp);
 						}
 					}
-					//CString str;
-					//str.Format("%d", ack.getSize());
-					//AfxMessageBox(str);
+					CString str;
+					str.Format("%d", ack.getSize());
+					AfxMessageBox(str);
 					CNodeQueryPackageAckOk ok;
 					ok.numFrame = ack.numFrame;
 					uv_write_t* write_req;
@@ -401,7 +401,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					buf = uv_buf_init(ok.toBuf(), ok.getSize());
 
 					write_req = (uv_write_t*)malloc(sizeof *write_req);
-					uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+					//uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 				}
 				offset += ack.getSize();
 			}
