@@ -8,9 +8,11 @@
 #include "VeriCountThread.h"
 #include "NodeQueryPackageReq.h"
 #include "NodeQueryPackageAck.h"
+#include "NodeQueryPackageAckOk.h"
 #include "NodeQueryEndPackageAck.h"
 #include "NodeQuickQueryPackageReq.h"
 #include "NodeQuickQueryEndPackageAck.h"
+#include "NodeQuickQueryPackageAckOk.h"
 #include "OnOffPackageReq.h"
 #include "AllNodes.h"
 #include "CommandPackageAck.h"
@@ -216,6 +218,26 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			}
 			default:
 				break;
+			}
+			break;
+		}
+		case 0x12:
+		{
+			CNodeQueryPackageAckOk req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+				
+			}
+			break;
+		}
+		case 0x13:
+		{
+			CNodeQuickQueryPackageAckOk req;
+			req.fromBuf(buf->base);
+			if (req.valid())
+			{
+
 			}
 			break;
 		}

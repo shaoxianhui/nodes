@@ -11,6 +11,7 @@
 #include <HartPackageAck.h>
 #include <NodeQuickQueryPackageAck.h>
 #include <NodeQueryPackageAck.h>
+#include <NodeQueryPackageAckOk.h>
 #include <NodeQueryEndPackageAck.h>
 #include <NodeQueryPackageReq.h>
 #include <Util.h>
@@ -21,6 +22,7 @@
 #include <task.h>
 #include <NodeQuickQueryPackageReq.h>
 #include <NodeQuickQueryEndPackageAck.h>
+#include <NodeQuickQueryPackageAckOk.h>
 #include <OnOffPackageReq.h>
 #include <CommandPackageAck.h>
 #include <DisplayPackageReq.h>
@@ -388,9 +390,18 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 							g_list->SetItemText(item, 4, temp);
 						}
 					}
-					CString str;
-					str.Format("%d", ack.getSize());
-					AfxMessageBox(str);
+					//CString str;
+					//str.Format("%d", ack.getSize());
+					//AfxMessageBox(str);
+					CNodeQueryPackageAckOk ok;
+					ok.numFrame = ack.numFrame;
+					uv_write_t* write_req;
+					uv_buf_t buf;
+
+					buf = uv_buf_init(ok.toBuf(), ok.getSize());
+
+					write_req = (uv_write_t*)malloc(sizeof *write_req);
+					uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 				}
 				offset += ack.getSize();
 			}
@@ -419,6 +430,15 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					CString str;
 					str.Format("%d", ack.getSize());
 					AfxMessageBox(str);
+					CNodeQuickQueryPackageAckOk ok;
+					ok.numFrame = ack.numFrame;
+					uv_write_t* write_req;
+					uv_buf_t buf;
+
+					buf = uv_buf_init(ok.toBuf(), ok.getSize());
+
+					write_req = (uv_write_t*)malloc(sizeof *write_req);
+					uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 				}
 				offset += ack.getSize();
 			}
