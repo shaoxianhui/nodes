@@ -33,9 +33,9 @@ static uv_timer_t repeat;
 static map<string, vector<CTcpTransaction>> allTcpTransactions;
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
-	buf->base = (char*)malloc(suggested_size);
-	buf->len = (ULONG)suggested_size;
-
+	static char slab[65536];
+	buf->base = slab;
+	buf->len = sizeof(slab);
 }
 static void on_close(uv_handle_t* peer)
 {

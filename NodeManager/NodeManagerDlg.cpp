@@ -327,8 +327,9 @@ void CNodeManagerDlg::OnBnClickedButtonCommand2()
 
 static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
-	buf->base = (char*)malloc(suggested_size);
-	buf->len = (ULONG)suggested_size;
+	static char slab[65536];
+	buf->base = slab;
+	buf->len = sizeof(slab);
 }
 
 static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
@@ -401,7 +402,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					buf = uv_buf_init(ok.toBuf(), ok.getSize());
 
 					write_req = (uv_write_t*)malloc(sizeof *write_req);
-					//uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
+					uv_write(write_req, (uv_stream_t*)&tcp_handle, &buf, 1, write_cb);
 				}
 				offset += ack.getSize();
 			}
