@@ -39,7 +39,7 @@ static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf
 }
 static void on_close(uv_handle_t* peer)
 {
-	free(peer);
+	//free(peer);
 }
 
 static void after_shutdown(uv_shutdown_t* req, int status)
@@ -53,7 +53,6 @@ static void after_write(uv_write_t* req, int status)
 
 	/* Free the read/write buffer and the request */
 	wr = (write_req_t*)req;
-	//free(wr->buf.base);
 	free(wr);
 }
 
@@ -62,9 +61,15 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 	uv_shutdown_t* sreq;
 
 	if (nread < 0) {
-		free(buf->base);
 		sreq = (uv_shutdown_t*)malloc(sizeof* sreq);
 		uv_shutdown(sreq, handle, after_shutdown);
+		//短链接清理链接缓存
+		for (int i = 0; i < client_count; i++)
+		{
+			vector<CTcpTransaction>* ts = (vector<CTcpTransaction>*)client[i]->data;
+			delete ts;
+		}
+		client_count = 0;
 		return;
 	}
 
@@ -317,7 +322,6 @@ static void repeat_cb(uv_timer_t* handle)
 				it = ts->erase(it);
 			}
 		}
-
 	}
 }
 

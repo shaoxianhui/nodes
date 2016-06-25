@@ -265,8 +265,19 @@ void CNodeManagerDlg::OnBnClickedButtonCommand()
 
 static uv_tcp_t tcp_handle;
 static uv_connect_t connect_req;
+typedef struct {
+  uv_write_t req;
+  uv_buf_t buf;
+} write_req_t;
 
 static void write_cb(uv_write_t* req, int status) {
+	//write_req_t* wr;
+
+	/* Free the read/write buffer and the request */
+	//wr = (write_req_t*)req;
+	//free(wr->buf.base);
+	//free(wr);
+
 	free(req);
 }
 
@@ -362,7 +373,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 				{
 					CString str;
 					str.Format("%d", ack.getSize());
-					AfxMessageBox(str);
+					//AfxMessageBox(str);
 				}
 				offset += ack.getSize();
 			}
@@ -393,7 +404,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 					}
 					CString str;
 					str.Format("%d", ack.getSize());
-					AfxMessageBox(str);
+					//AfxMessageBox(str);
 					CNodeQueryPackageAckOk ok;
 					ok.numFrame = ack.numFrame;
 					uv_write_t* write_req;

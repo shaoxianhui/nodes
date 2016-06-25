@@ -165,6 +165,10 @@ public:
 			}
 			*len = numFrame;
 		}
+		else
+		{
+			*len = 0;
+		}
 		return ret;
 	}
 	int getNodeQucikQueryPackageAck(CNodeQuickQueryPackageAck* ack, int* len)
