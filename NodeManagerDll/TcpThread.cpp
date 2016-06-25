@@ -39,7 +39,7 @@ static void echo_alloc(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf
 }
 static void on_close(uv_handle_t* peer)
 {
-	//free(peer);
+	free(peer);
 }
 
 static void after_shutdown(uv_shutdown_t* req, int status)
@@ -74,7 +74,7 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 	}
 
 	if (nread == 0) {
-		free(buf->base);
+		//free(buf->base);
 		return;
 	}
 
