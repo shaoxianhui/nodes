@@ -197,7 +197,6 @@ NODEMANAGERDLL_API void NodeCmdSend(CNodeInfo* nodeInfo, uchar type, ushort data
 			info->trycount = 0;
 			info->info.setFail();
 		}
-
 		break;
 	}
 	}

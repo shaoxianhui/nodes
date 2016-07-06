@@ -66,6 +66,7 @@ END_MESSAGE_MAP()
 // CNodeManagerDlg 对话框
 CNodeManagerDlg::CNodeManagerDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_NODEMANAGER_DIALOG, pParent)
+	, m_dwTimer(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -74,6 +75,7 @@ void CNodeManagerDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST1, m_list);
+	DDX_Text(pDX, IDC_EDIT_TIMER, m_dwTimer);
 }
 
 BEGIN_MESSAGE_MAP(CNodeManagerDlg, CDialogEx)
@@ -94,6 +96,8 @@ BEGIN_MESSAGE_MAP(CNodeManagerDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_QUICK, &CNodeManagerDlg::OnBnClickedButtonQuick)
 	ON_BN_CLICKED(IDC_BUTTON_COMMAND3, &CNodeManagerDlg::OnBnClickedButtonCommand3)
 	ON_BN_CLICKED(IDC_BUTTON_COMMAND4, &CNodeManagerDlg::OnBnClickedButtonCommand4)
+	ON_BN_CLICKED(IDC_BUTTON_TIMER_SEND, &CNodeManagerDlg::OnBnClickedButtonTimerSend)
+	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
 // CNodeManagerDlg 消息处理程序
@@ -232,6 +236,7 @@ void CNodeManagerDlg::OnBnClickedButtonInfo()
 				m_list.SetItemText(item, 4, temp);
 			}
 		}
+		delete[] list.nodeInfoList;
 	}
 }
 
@@ -558,4 +563,19 @@ void CNodeManagerDlg::OnBnClickedButtonCommand4()
 			AfxMessageBox(str);
 		}
 	}
+}
+
+
+void CNodeManagerDlg::OnBnClickedButtonTimerSend()
+{
+	UpdateData();
+	KillTimer(1);
+	SetTimer(1, m_dwTimer, NULL);
+}
+
+
+void CNodeManagerDlg::OnTimer(UINT_PTR nIDEvent)
+{
+	OnBnClickedButtonInfo();
+	CDialogEx::OnTimer(nIDEvent);
 }

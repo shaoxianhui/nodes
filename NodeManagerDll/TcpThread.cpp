@@ -110,8 +110,8 @@ static void after_read(uv_stream_t* handle, ssize_t nread, const uv_buf_t* buf)
 			req.fromBuf(buf->base);
 			if (req.valid())
 			{
-				CNodeQueryPackageAck acks[4];
-				int len = 4;
+				CNodeQueryPackageAck acks[36];
+				int len = 36;
 				int count = 0;
 				count = CAllNodes::GetInstance()->getNodeQueryPackageAck(acks, &len);
 				for (int i = 0; i < len; i++)

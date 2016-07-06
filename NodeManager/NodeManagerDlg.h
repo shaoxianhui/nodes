@@ -52,4 +52,10 @@ private:
 public:
 	afx_msg void OnBnClickedButtonCommand3();
 	afx_msg void OnBnClickedButtonCommand4();
+	afx_msg void OnBnClickedButtonTimerSend();
+protected:
+	// 定时器时间
+	DWORD m_dwTimer;
+public:
+	afx_msg void OnTimer(UINT_PTR nIDEvent);
 };
