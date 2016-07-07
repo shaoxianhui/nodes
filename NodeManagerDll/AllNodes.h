@@ -70,7 +70,15 @@ public:
 	CNodeInfoWithSocket* findNodeByUID(uchar UID[12])
 	{
 		string uid = CUtil::UIDtoString((char*)UID);
-		return &allNodes[uid];
+		map<string, CNodeInfoWithSocket>::iterator it = allNodes.find(uid);
+		if (it == allNodes.end())
+		{
+			return NULL;
+		}
+		else
+		{
+			return &allNodes[uid];
+		}
 	}
 	CNodeInfoWithSocket* findNodeBySock(const struct sockaddr* addr)
 	{

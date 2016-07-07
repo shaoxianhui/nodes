@@ -335,7 +335,7 @@ DWORD WINAPI TcpThreadProc(LPVOID lpParam)
 	uv_listen((uv_stream_t*)&tcp_server, SOMAXCONN, on_connection);
 
 	uv_timer_init(&loop, &repeat);
-	uv_timer_start(&repeat, repeat_cb, 5000, 5000);
+	uv_timer_start(&repeat, repeat_cb, 10000, 10000);
 	uv_run(&loop, UV_RUN_DEFAULT);
 	return 0;
 }
